@@ -1,0 +1,8 @@
+```{r child_cnv, context="server"}
+output$cnv <- renderPlotly({
+	
+})
+```
+```{r}
+plotlyOutput("cnv")
+```

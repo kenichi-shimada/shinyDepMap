@@ -1,0 +1,76 @@
+---
+title: "DepMap"
+runtime: shiny_prerendered
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: cerulean
+---
+
+```{r setup, context="setup",include=FALSE}
+library(shiny) ## shiny
+library(dplyr)
+library(flexdashboard) # devtools::install_github('rstudio/flexdashboard')
+library(tidyr)
+library(tibble)
+library(ggplot2) # devtools::install_github('hadley/ggplot2')
+library(grid)
+library(RColorBrewer)
+library(shinyWidgets)
+library(plotly)
+library(DT)
+
+library(aws.s3)
+```
+
+```{r global, context="data"}
+x <- load("data/depmap_load_data.rda")
+coefex <- readRDS("coefex_subset.rds")
+```
+
+Clusters (essential genes)
+============================================================================
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+```{r sidebar2, child="rmd_depmap/ess_genes_sidebar.rmd"}
+## 0. sidebar (highlight)
+```
+
+Column {data-height=500}
+-----------------------------------------------------------------------
+### tSNE (1841 essential genes)
+```{r rtsne, child="rmd_depmap/rtsne.rmd"}
+## color efficacy, selectivity, cluster, correlation (to gene), likelihood (if cluster), 
+## change margin, remove title
+## gene -> cluster -> highlight both
+## add correlation
+
+## gene -> cluster -> show cluster members/enriched pathways
+## pathways -> show enriched clusters
+```
+
+### Efficacy/Selectivity
+```{r summary_q10_r80, child="rmd_depmap/efficacy_selectivity_summary.rmd"}
+## remove weak points
+## all genes -> essential or not (show efficacy.)
+```
+
+Column {.tabset data-height=500}
+-----------------------------------------------------------------------
+### Gene sets
+```{r gene_sets, child="rmd_depmap/gene_sets.rmd"}
+```
+
+### Lineage
+```{r lineage, child="rmd_depmap/lineage.rmd"}
+## For gene -> gid, symbol, gene name, paralogs, coupled genes, etc
+## for pathway and cluster
+## beyond here, implement for cluster and gene, each.
+### 4. associated lineage information 
+```
+
+### Inter-cluster correlation
+```{r Inter_cluster, child="rmd_depmap/inter_cluster.rmd"}
+### 5. inter-cluster correlation (heatmap)
+```

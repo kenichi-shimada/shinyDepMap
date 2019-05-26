@@ -1,0 +1,54 @@
+```{r child_inter_cluster, context="server"}
+output$inter_cluster <- renderPlotly({
+	gen.path2 <- igenclust2() 
+	eid2 <- ieid2() 
+	path2 <- ipath2() 
+	clust2 <- iclust2()
+	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+
+	if(is.null(gen.path2)|
+		(gen.path2=="gene"&is.null(eid2))|
+		(gen.path2=="pathway"&is.null(path2))|
+		(gen.path2=="cluster"&is.null(clust2)))
+	return(NULL)
+
+	if(gen.path2=="gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		eids <- msigdb.ess[[path2]]
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
+	this.ef <- coef[eid2,]
+
+	ef.1 <- data.frame(ef=this.ef,eid=names(this.ef),stringsAsFactors=FALSE) %>%
+		left_join(mems,by="eid")
+
+	med.mem <- tapply(ef.1$ef,ef.1$mem,median)
+	o <- order(med.mem,decreasing=F)
+	clust.levs <- names(med.mem)[o]
+
+	ef.1 <- ef.1 %>% mutate(mem=factor(mem,levels=clust.levs))
+
+	pvio <- ef.1 %>%
+		ggplot(aes(x=mem,y=ef)) +
+		geom_violin(scale="area",aes(fill=mem,color=mem)) +
+		geom_jitter(height = 0, width = 0.1, size=.3) +
+		coord_flip() +
+		theme_bw() +
+		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+		  axis.text=element_text(size=10),axis.title=element_text(size=10),
+		  plot.title=element_text(size=10),
+		  axis.text.x = element_text(angle = 0)) +
+		labs(x="",y="Spearman correlation",title="")
+
+	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
+	for(i in 1:116)ply$x$data[[i]]$hoverinfo <- "none"
+    ply$x$data[[117]]$text <- ef.1$text
+	ply 	
+})
+```
+```{r}
+plotlyOutput("inter_cluster")
+```

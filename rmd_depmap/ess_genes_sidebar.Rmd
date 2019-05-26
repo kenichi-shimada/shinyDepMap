@@ -1,0 +1,49 @@
+```{r child_sidebar2}
+## choose genes
+radioButtons("ess_gen_clust",h4("Gene or cluster:"),
+  choices=c("gene","pathway","cluster"),
+  selected="gene")
+
+conditionalPanel("input.ess_gen_clust == 'gene'",
+  pickerInput(
+  	inputId = "eid2",
+  	label = h4("Gene:"),
+  	choices = eids.all[match(mems$eid,eids.all)],
+  	options = list(`live-search` = TRUE)))
+
+conditionalPanel("input.ess_gen_clust == 'pathway'",
+  pickerInput(
+  	inputId = "path2",
+  	label = h4("Pathway:"),
+  	choices = names(msigdb.ess)[1:100],
+  	options = list(`live-search` = TRUE)))
+
+conditionalPanel("input.ess_gen_clust == 'cluster'",
+  pickerInput(
+  	inputId = "clust2",
+  	label = h4("cluster:"),
+  	choices = 1:100,
+  	options = list(`live-search` = TRUE)))
+# conditionalPanel("input.ess_gen_clust == 'cluster'",
+#   pickerInput(
+#     inputId = "clust",
+#     label = h4("cluster ID:"),
+#     choices = 1:100,
+#     options = list(`live-search` = TRUE)))
+
+## highlight cluster by some colors
+
+## 0. sidebar (highlight)
+HTML("<hr>")
+
+selectInput("color_code2",h4("Color coded by:"),
+  choices=c("gene,pathway,cluster","efficacy","selectivity"),
+  selected="gene,pathway")
+```
+```{r child_reactive2, context="server"}
+igenclust2 <- reactive(input$ess_gen_clust) ## gene, orthogroup
+ieid2 <- reactive(input$eid2)
+ipath2 <- reactive(input$path2)
+iclust2 <- reactive(input$clust2)
+icolor2 <- reactive(input$color_code2)
+```
