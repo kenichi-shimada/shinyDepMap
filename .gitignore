@@ -1,6 +1,7 @@
 .Renviron
 .DS_Store
 *.rda
+archive
 rsconnect
 run_shinyapp_new.R
 
