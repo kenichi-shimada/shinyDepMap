@@ -6,21 +6,23 @@ output$lineage <- renderPlotly({
 	clust2 <- iclust2()
 	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
 
-	if(is.null(gen.path2)|
-		(gen.path2=="gene"&is.null(eid2))|
-		(gen.path2=="pathway"&is.null(path2))|
-		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)
+	this.ef <- ief2()
+	gs2 <- igs2()
+
+	if(is.null(gen.path2)|(gen.path2=="gene"&is.null(eid2))){
+		return(NULL)
+	}else if(gen.path2 %in% c("pathway","cluster")){
+		stop("Choose a single gene (not pathway or cluster) to show this plot.")
+	}
 
 	if(gen.path2=="gene"){
 		eids <- eid2
 	}else if(gen.path2=="pathway"){
-		eids <- msigdb.ess[[path2]]
+		eids <- gs2
 	}else if(gen.path2=="cluster"){
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	this.ef <- ef.ess[eid2,]
 	ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
 		left_join(cl.info,by="DepMap_ID") %>%
 		mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_Name))
@@ -43,6 +45,7 @@ output$lineage <- renderPlotly({
 		geom_jitter(height = 0, width = 0.2, size=.5) +
 		coord_flip() +
 		theme_bw() +
+
 		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 		  axis.text=element_text(size=10),axis.title=element_text(size=10),
 		  plot.title=element_text(size=10),

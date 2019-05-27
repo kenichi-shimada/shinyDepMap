@@ -5,24 +5,29 @@ output$gene_sets <- renderDataTable({
 	path2 <- ipath2() 
 	clust2 <- iclust2()
 	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+	lik2 <- ilik2()
+
+	gs2 <- igs2()
 
 	if(is.null(gen.path2)|
 		(gen.path2=="gene"&is.null(eid2))|
 		(gen.path2=="pathway"&is.null(path2))|
 		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)	
+	return(NULL)
 
 	if(gen.path2=="gene"){
 		eids <- eid2
 	}else if(gen.path2=="pathway"){
-		eids <- msigdb.ess[[path2]]
+		eids <- gs2
 	}else if(gen.path2=="cluster"){
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	dt <- df %>% filter(eid %in% eids) %>%
-		select(eid, sym, efficacy, selectivity) %>%
-		arrange(efficacy,desc(selectivity)) %>%
+	dt <- mems %>% filter(eid %in% eids) %>%
+		select(eid, sym, efficacy, selectivity, mem, lik) %>%
+		`colnames<-`(c("gene.id","symbol","eff","sel","cluster","lik")) %>%
+		arrange(eff,desc(sel)) %>%
+		filter(lik >= lik2) %>%
 		datatable()
 		# datatable(extensions = 'Scroller', 
 		# 	options = list(

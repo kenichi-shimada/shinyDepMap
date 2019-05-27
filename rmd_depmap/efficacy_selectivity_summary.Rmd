@@ -5,6 +5,9 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	path2 <- ipath2() 
 	clust2 <- iclust2()
 	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+	lik2 <- ilik2()
+
+	gs2 <- igs2()
 
 	if(is.null(gen.path2)|
 		(gen.path2=="gene"&is.null(eid2))|
@@ -15,14 +18,12 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	if(gen.path2=="gene"){
 		eids <- eid2
 	}else if(gen.path2=="pathway"){
-		eids <- msigdb.ess[[path2]]
+		eids <- gs2
 	}else if(gen.path2=="cluster"){
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	df.0 <- df %>% filter(efficacy >= thres)
-	df.1 <- df %>% filter(efficacy < thres)
-	if(color2 %in% c("gene,pathway,cluster")){
+	if(color2 %in% c("density")){
 		df.1 <- df.1 %>% arrange(d) %>% mutate(pri=d)
 		col <- scale_color_identity()
 	}else if(color2=="efficacy"){
@@ -32,23 +33,26 @@ output$summary_efficacy_selectivity <- renderPlotly({
 		df.1 <- df.1 %>% arrange(selectivity) %>% mutate(pri=selectivity)
 		col <- scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))
 	}
+
 	p <- ggplot(df,aes(text=text)) +
 		geom_vline(xintercept=thres) +
-		geom_point(data=(df.0),aes(efficacy, selectivity), col="grey70", size = 1) +
-		geom_point(data=(df.1 %>% filter(!eid %in% eids)),
-			aes(efficacy, selectivity, col=pri), size = 1) +
+		geom_point(data=(df.0),aes(efficacy, selectivity), col="grey80", alpha=.5,size = .3) +
+		geom_point(data=(df.1 %>% filter(!eid %in% eids) %>% filter(lik < lik2)),
+			aes(efficacy,selectivity),col="grey80",alpha=.5,size = .3) +
+		geom_point(data=(df.1 %>% filter(!eid %in% eids) %>% filter(lik >= lik2)),
+			aes(efficacy, selectivity, col=pri), size = .5) +
 		col +
-		geom_point(data=(df.1 %>% filter(eid %in% eids)),
-			aes(efficacy,selectivity),col="red",size=3) +
+		geom_point(data=(df.1 %>% filter(eid %in% eids) %>% filter(lik < lik2)),
+			aes(efficacy,selectivity),col="grey50",size=1) +
+		geom_point(data=(df.1 %>% filter(eid %in% eids) %>% filter(lik >= lik2)),
+			aes(efficacy,selectivity),col="red",size=1) +
 		theme_bw() +
+		# xlim(xl[1],xl[2]) +
+		# ylim(yl[1],yl[2]) +
 	    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 	      axis.text=element_text(size=10),axis.title=element_text(size=10),
 	      plot.title=element_text(size=10),
 	      axis.text.x = element_text(angle = 0))
-	ply <- ggplotly(p,tooltip="text")
-	ply
-
-	# stop(df$efficacy)
 	ply <- ggplotly(p,tooltip="text")
 	ply
 })

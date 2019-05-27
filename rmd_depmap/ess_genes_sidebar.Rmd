@@ -1,6 +1,6 @@
 ```{r child_sidebar2}
 ## choose genes
-radioButtons("ess_gen_clust",h4("Gene or cluster:"),
+radioButtons("ess_gen_clust",h4("Search:"),
   choices=c("gene","pathway","cluster"),
   selected="gene")
 
@@ -8,42 +8,67 @@ conditionalPanel("input.ess_gen_clust == 'gene'",
   pickerInput(
   	inputId = "eid2",
   	label = h4("Gene:"),
-  	choices = eids.all[match(mems$eid,eids.all)],
+  	choices = eids.ess,
   	options = list(`live-search` = TRUE)))
 
 conditionalPanel("input.ess_gen_clust == 'pathway'",
   pickerInput(
   	inputId = "path2",
   	label = h4("Pathway:"),
-  	choices = names(msigdb.ess)[1:100],
+  	choices = nm.msigdb.ess,
   	options = list(`live-search` = TRUE)))
 
 conditionalPanel("input.ess_gen_clust == 'cluster'",
   pickerInput(
   	inputId = "clust2",
-  	label = h4("cluster:"),
-  	choices = 1:100,
-  	options = list(`live-search` = TRUE)))
-# conditionalPanel("input.ess_gen_clust == 'cluster'",
-#   pickerInput(
-#     inputId = "clust",
-#     label = h4("cluster ID:"),
-#     choices = 1:100,
-#     options = list(`live-search` = TRUE)))
+  	label = h4("Cluster:"),
+  	choices = 1:180,
+  	options = list(`live-search` = FALSE)))
+
 
 ## highlight cluster by some colors
 
 ## 0. sidebar (highlight)
 HTML("<hr>")
 
-selectInput("color_code2",h4("Color coded by:"),
-  choices=c("gene,pathway,cluster","efficacy","selectivity"),
-  selected="gene,pathway")
+sliderInput("lik2",h5("Cluster threshold (Likelihood):"),
+  min=0,max=1,value=0.5)
+
+selectInput("color_code2",h5("Color coded by:"),
+  choices=c("density","efficacy","selectivity"),
+  selected="selectivity")
+
 ```
+
 ```{r child_reactive2, context="server"}
 igenclust2 <- reactive(input$ess_gen_clust) ## gene, orthogroup
 ieid2 <- reactive(input$eid2)
 ipath2 <- reactive(input$path2)
 iclust2 <- reactive(input$clust2)
 icolor2 <- reactive(input$color_code2)
+ilik2 <- reactive(input$lik2)
+
+ief2 <- reactive({
+  if(is.null(input$eid2)){
+    NULL
+  }else{
+    s3readRDS(paste0("ef_ess/",input$eid2,".rds"),bucket="depmap")
+  }
+})
+
+icoef2 <- reactive({
+  if(is.null(input$eid2)){
+    NULL
+  }else{
+      s3readRDS(paste0("coef_ess/",input$eid2,".rds"),bucket="depmap")
+  }
+})
+
+igs2 <- reactive({
+  if(is.null(input$path2)){
+    NULL
+  }else{
+    s3readRDS(paste0("msigdb_ess/",input$path2,".rds"),bucket="depmap")
+  }
+})
 ```

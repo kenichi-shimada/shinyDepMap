@@ -5,34 +5,50 @@ output$inter_cluster <- renderPlotly({
 	path2 <- ipath2() 
 	clust2 <- iclust2()
 	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+	lik2 <- ilik2()
 
-	if(is.null(gen.path2)|
-		(gen.path2=="gene"&is.null(eid2))|
-		(gen.path2=="pathway"&is.null(path2))|
-		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)
+	this.coef <- icoef2()
+	gs2 <- igs2()
+
+	if(is.null(gen.path2)|(gen.path2=="gene"&is.null(eid2))){
+		return(NULL)
+	}else if(gen.path2 %in% c("pathway","cluster")){
+		stop("Choose a single gene (not pathway or cluster) to show this plot.")
+	}
 
 	if(gen.path2=="gene"){
 		eids <- eid2
 	}else if(gen.path2=="pathway"){
-		eids <- msigdb.ess[[path2]]
+		eids <- gs2
 	}else if(gen.path2=="cluster"){
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	this.ef <- coef[eid2,]
+	this.sym <- mems$syms.all[mems$eid == eid2]
+	this.mem <- mems$mem[mems$eid == eid2]
+	this.lik <- mems$lik[mems$eid == eid2]
+	if(this.lik < lik2){
+		txt <- paste0("The likelihood of ",this.sym," being in the cluster ",
+			this.mem," (",this.lik,") is lower than the threshold (",lik2,").",
+			" Try lowering the threshold to see this plot.")
+		stop(txt)
+	}
 
-	ef.1 <- data.frame(ef=this.ef,eid=names(this.ef),stringsAsFactors=FALSE) %>%
-		left_join(mems,by="eid")
+	coef.1 <- data.frame(coef=this.coef,eid=names(this.coef),stringsAsFactors=FALSE) %>%
+		left_join(mems,by="eid") %>% 
+		filter(lik >= lik2)
+	# stop(paste(names(coef.1),collapse="\n"))	
+	# stop(paste(dim(coef.1),collapse="\n"))			
+	# stop(paste(sapply(coef.1,class),collpase="\n"))
 
-	med.mem <- tapply(ef.1$ef,ef.1$mem,median)
+	med.mem <- tapply(coef.1$coef,coef.1$mem,median)
 	o <- order(med.mem,decreasing=F)
 	clust.levs <- names(med.mem)[o]
 
-	ef.1 <- ef.1 %>% mutate(mem=factor(mem,levels=clust.levs))
+	coef.1 <- coef.1 %>% mutate(mem=factor(mem,levels=clust.levs)) 
 
-	pvio <- ef.1 %>%
-		ggplot(aes(x=mem,y=ef)) +
+	pvio <- coef.1 %>%
+		ggplot(aes(x=mem,y=coef)) +
 		geom_violin(scale="area",aes(fill=mem,color=mem)) +
 		geom_jitter(height = 0, width = 0.1, size=.3) +
 		coord_flip() +
@@ -44,9 +60,10 @@ output$inter_cluster <- renderPlotly({
 		labs(x="",y="Spearman correlation",title="")
 
 	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
-	for(i in 1:116)ply$x$data[[i]]$hoverinfo <- "none"
-    ply$x$data[[117]]$text <- ef.1$text
-	ply 	
+	ndata <- length(ply$x$data)
+	for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
+    ply$x$data[[ndata]]$text <- coef.1$text
+	ply
 })
 ```
 ```{r}
