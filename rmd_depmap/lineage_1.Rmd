@@ -1,0 +1,46 @@
+```{r child_lineage1, context="server"}
+output$lineage1 <- renderPlotly({
+	go <- igo()
+	syms <- isolate(isym1())
+	this.ef <- isolate(ief1())
+
+	if(is.null(this.ef))return(NULL)
+
+	ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
+		left_join(cl.info,by="DepMap_ID") %>%
+		mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_Name))
+
+	med.ef <- tapply(ef.1$ef,ef.1$Primary.Disease,median)
+	o <- order(med.ef,decreasing=F)
+	cell.levs <- names(med.ef)[o]
+
+	ef.1 <- ef.1 %>% 
+		mutate(Primary.Disease=factor(Primary.Disease,levels=cell.levs)) %>%
+		mutate(text=paste0(
+			"Cell: ",cell.name,"<br />",
+			"Type: ",Primary.Disease,"<br />",
+			"Subtype: ",Subtype.Disease,"<br />",
+			"Efficacy: ",round(ef,3),"<br />"))
+
+	pvio <- ef.1 %>%
+		ggplot(aes(x=Primary.Disease,y=ef)) +
+		geom_violin(scale="area",aes(fill=Primary.Disease,color=Primary.Disease)) +
+		geom_jitter(height = 0, width = 0.2, size=.5) +
+		coord_flip() +
+		theme_bw() +
+		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+		  axis.text=element_text(size=10),axis.title=element_text(size=10),
+		  plot.title=element_text(size=10),
+		  axis.text.x = element_text(angle = 0)) +
+		labs(x="",y="Efficacy score",title="")
+
+	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
+	for(i in 1:20)ply$x$data[[i]]$hoverinfo <- "none"
+    ply$x$data[[21]]$text <- ef.1$text
+	ply 
+})
+```
+```{r}
+plotlyOutput("lineage1")
+```
+

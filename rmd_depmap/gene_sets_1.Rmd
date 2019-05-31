@@ -1,0 +1,26 @@
+```{r child_gene_sets1, context="server"}
+output$gene_sets1 <- renderDataTable({
+	go <- igo()
+	syms <- isolate(isym1())
+
+	if(syms=="")return(NULL)
+	eids <- df$eid[grep(paste0("^",syms),df$sym,ignore.case=T)]
+
+	dt <- df %>% filter(eid %in% eids) %>%
+		select(eid, sym, efficacy, selectivity) %>%
+		`colnames<-`(c("gene.id","symbol","eff","sel")) %>%
+		arrange(eff,desc(sel)) %>%
+		datatable()
+		# datatable(extensions = 'Scroller', 
+		# 	options = list(
+		# 		rowReorder = TRUE
+		# 	  deferRender = TRUE,
+		# 	  scrollY = 200,
+		# 	  scroller = TRUE
+		# 	))
+	return(dt)
+})
+```
+```{r}
+dataTableOutput("gene_sets1")
+```

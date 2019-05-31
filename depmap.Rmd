@@ -27,7 +27,38 @@ library(aws.s3)
 x <- load("data/depmap_initial.rda")
 ```
 
-Clusters (essential genes)
+All genes
+============================================================================
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+```{r sidebar1, child="rmd_depmap/all_genes_sidebar.Rmd"}
+## 0. sidebar (highlight)
+```
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+### Efficacy/Selectivity
+```{r summary_q10_r80_1, child="rmd_depmap/efficacy_selectivity_summary_1.Rmd"}
+## remove weak points
+## all genes -> essential or not (show efficacy.)
+```
+
+Column {.tabset data-width=400}
+-----------------------------------------------------------------------
+### Gene sets
+```{r gene_sets1, child="rmd_depmap/gene_sets_1.Rmd"}
+```
+
+### Lineage
+```{r lineage1, child="rmd_depmap/lineage_1.Rmd"}
+## For gene -> gid, symbol, gene name, paralogs, coupled genes, etc
+## for pathway and cluster
+## beyond here, implement for cluster and gene, each.
+### 4. associated lineage information 
+```
+
+
+Essential genes
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
@@ -35,7 +66,7 @@ Sidebar {.sidebar}
 ## 0. sidebar (highlight)
 ```
 
-Column {data-height=500}
+Column {data-width=500}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity
 ```{r summary_q10_r80, child="rmd_depmap/efficacy_selectivity_summary.Rmd"}
@@ -54,7 +85,7 @@ Column {data-height=500}
 ## pathways -> show enriched clusters
 ```
 
-Column {.tabset data-height=500}
+Column {.tabset data-width=500}
 -----------------------------------------------------------------------
 ### Gene sets
 ```{r gene_sets, child="rmd_depmap/gene_sets.Rmd"}
@@ -72,3 +103,7 @@ Column {.tabset data-height=500}
 ```{r Inter_cluster, child="rmd_depmap/inter_cluster.Rmd"}
 ### 5. inter-cluster correlation (heatmap)
 ```
+
+About
+============================================================================
+Please contact [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu) for questions about the information on this website.

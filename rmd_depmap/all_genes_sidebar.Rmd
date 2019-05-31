@@ -1,0 +1,23 @@
+```{r child_sidebar1}
+## choose genes
+textInput(
+	inputId = "sym1",
+	label = h4("Gene symbol:"),
+  value = "",
+  placeholder="Full or partial name")
+actionButton("goButton", "Go")
+```
+
+```{r child_reactive1, context="server"}
+igo <- reactive(input$goButton)
+isym1 <- reactive(input$sym1)
+ief1 <- reactive({
+  syms <- input$sym1
+  eids <- df$eid[df$sym==toupper(syms)]
+  if(length(eids)==1){
+    s3readRDS(paste0("ef_all/",eids,".rds"),bucket="depmap")
+  }else{
+    NULL
+  }
+})
+```

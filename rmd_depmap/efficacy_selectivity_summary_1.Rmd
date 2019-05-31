@@ -1,0 +1,38 @@
+```{r child_summary_efficacy_selectivity1, context="server"}
+output$summary_efficacy_selectivity1 <- renderPlotly({
+	go <- igo()
+	syms <- isolate(isym1())
+
+	if(syms==""){
+		eids <- ""
+	}else{
+		grep.syms <- grepl(paste0("^",syms),df$sym,ignore.case=T)
+		eids <- df$eid[grep.syms]
+	}
+	
+	df <- df %>% arrange(d) %>% mutate(pri=d)
+	col <- scale_color_identity()
+
+	p <- ggplot(df,aes(text=text)) +
+		geom_vline(xintercept=thres) +
+		geom_point(data=(df %>% filter(!eid %in% eids)),
+			aes(efficacy, selectivity, col=pri), size = .5) +
+		col +
+		theme_bw() +
+		# xlim(xl[1],xl[2]) +
+		# ylim(yl[1],yl[2]) +
+	    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+	      axis.text=element_text(size=10),axis.title=element_text(size=10),
+	      plot.title=element_text(size=10),
+	      axis.text.x = element_text(angle = 0))
+    if(sum(df$eid %in% eids)>0){
+		p <- p + geom_point(data=(df %>% filter(eid %in% eids)),
+			aes(efficacy,selectivity),col="red",size=1)
+    }
+	ply <- ggplotly(p,tooltip="text")
+	ply
+})
+```
+```{r}
+plotlyOutput('summary_efficacy_selectivity1')
+```
