@@ -1,7 +1,8 @@
 ```{r child_sidebar2}
 ## choose genes
 radioButtons("ess_gen_clust",h4("Search:"),
-  choices=c("gene","pathway","cluster"),
+  # choices=c("gene","pathway","cluster"),
+  choices=c("gene","cluster"),  
   selected="gene")
 
 conditionalPanel("input.ess_gen_clust == 'gene'",
@@ -32,7 +33,7 @@ conditionalPanel("input.ess_gen_clust == 'cluster'",
 HTML("<hr>")
 
 sliderInput("lik2",h5("Cluster consistency (Likelihood):"),
-  min=0,max=1,value=0)
+  min=0,max=1,round=-1,value=0.4)
 
 selectInput("color_code2",h5("Color coded by:"),
   choices=c("density","efficacy","selectivity"),
@@ -52,7 +53,7 @@ ief2 <- reactive({
   if(is.null(input$eid2)){
     NULL
   }else{
-    s3readRDS(paste0("ef_ess/",input$eid2,".rds"),bucket="depmap")
+    s3readRDS(paste0("ef_all_19q2/",input$eid2,".rds"),bucket="depmap")
   }
 })
 
@@ -60,7 +61,7 @@ icoef2 <- reactive({
   if(is.null(input$eid2)){
     NULL
   }else{
-      s3readRDS(paste0("coef_ess/",input$eid2,".rds"),bucket="depmap")
+      s3readRDS(paste0("coef_ess_19q2/",input$eid2,".rds"),bucket="depmap")
   }
 })
 
@@ -68,7 +69,8 @@ igs2 <- reactive({
   if(is.null(input$path2)){
     NULL
   }else{
-    s3readRDS(paste0("msigdb_ess/",input$path2,".rds"),bucket="depmap")
+    s3readRDS(paste0("msigdb_ess_19q2/",input$path2,".rds"),bucket="depmap")
   }
 })
+
 ```

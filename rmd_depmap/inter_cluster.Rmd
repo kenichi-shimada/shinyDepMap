@@ -24,7 +24,7 @@ output$inter_cluster <- renderPlotly({
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	this.sym <- mems$syms.all[mems$eid == eid2]
+	this.sym <- mems$sym.all[mems$eid == eid2]
 	this.mem <- mems$mem[mems$eid == eid2]
 	this.lik <- mems$lik[mems$eid == eid2]
 	if(this.lik < lik2){

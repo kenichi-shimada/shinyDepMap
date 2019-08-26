@@ -1,43 +1,52 @@
 ```{r child_lineage1, context="server"}
+# output$probe_input_cross <- renderUI({ ## in response to symbol, get the probe
+#   this.set <- probes.lst.1[[isym1()]]
+#   selectInput("probe_cross", "Probe (in rat230_2 array):",
+#               choices = this.set,selected = this.set[[1]])
+# })
+# uiOutput("probe_input_cross"))
+
 output$lineage1 <- renderPlotly({
 	go <- igo()
-	syms <- isolate(isym1())
+	# sym2 <- isolate(isym2())
 	this.ef <- isolate(ief1())
 
-	if(is.null(this.ef))return(NULL)
+	if(is.null(this.ef))return(NULL);
 
 	ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
 		left_join(cl.info,by="DepMap_ID") %>%
-		mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_Name))
+		mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_name))
 
-	med.ef <- tapply(ef.1$ef,ef.1$Primary.Disease,median)
+	med.ef <- tapply(ef.1$ef,ef.1$disease,median)
 	o <- order(med.ef,decreasing=F)
 	cell.levs <- names(med.ef)[o]
 
 	ef.1 <- ef.1 %>% 
-		mutate(Primary.Disease=factor(Primary.Disease,levels=cell.levs)) %>%
+		mutate(disease=factor(disease,levels=cell.levs)) %>%
 		mutate(text=paste0(
 			"Cell: ",cell.name,"<br />",
-			"Type: ",Primary.Disease,"<br />",
-			"Subtype: ",Subtype.Disease,"<br />",
+			"Type: ",disease,"<br />",
+			"Subtype: ",disease_sutype,"<br />",
+			"Sub-subtype: ",disease_sub_subtype,"<br />",
 			"Efficacy: ",round(ef,3),"<br />"))
 
 	pvio <- ef.1 %>%
-		ggplot(aes(x=Primary.Disease,y=ef)) +
-		geom_violin(scale="area",aes(fill=Primary.Disease,color=Primary.Disease)) +
+		ggplot(aes(x=disease,y=ef)) +
+		geom_violin(scale="area",aes(fill=disease,color=disease)) +
 		geom_jitter(height = 0, width = 0.2, size=.5) +
 		coord_flip() +
 		theme_bw() +
 		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
-		  axis.text=element_text(size=10),axis.title=element_text(size=10),
+		  axis.text=element_text(size=8),axis.title=element_text(size=10),
 		  plot.title=element_text(size=10),
 		  axis.text.x = element_text(angle = 0)) +
 		labs(x="",y="Efficacy score",title="")
 
 	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
-	for(i in 1:20)ply$x$data[[i]]$hoverinfo <- "none"
-    ply$x$data[[21]]$text <- ef.1$text
-	ply 
+	ndata <- length(ply$x$data)
+	for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
+    ply$x$data[[ndata]]$text <- ef.1$text
+	ply
 })
 ```
 ```{r}

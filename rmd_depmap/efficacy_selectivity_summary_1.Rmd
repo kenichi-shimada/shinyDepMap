@@ -14,7 +14,8 @@ output$summary_efficacy_selectivity1 <- renderPlotly({
 	col <- scale_color_identity()
 
 	p <- ggplot(df,aes(text=text)) +
-		geom_vline(xintercept=thres) +
+		geom_vline(xintercept=thres.eff) +
+		# geom_vline(yintercept=thres.sel) +
 		geom_point(data=(df %>% filter(!eid %in% eids)),
 			aes(efficacy, selectivity, col=pri), size = .5) +
 		col +

@@ -24,7 +24,7 @@ library(aws.s3)
 ```
 
 ```{r global, context="data"}
-x <- load("data/depmap_initial.rda")
+x <- load("data/depmap_initial_19q2.rda")
 ```
 
 All genes

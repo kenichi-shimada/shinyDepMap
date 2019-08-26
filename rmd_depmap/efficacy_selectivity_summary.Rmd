@@ -35,7 +35,7 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	}
 
 	p <- ggplot(df,aes(text=text)) +
-		geom_vline(xintercept=thres) +
+		geom_vline(xintercept=thres.eff) +
 		geom_point(data=(df.0),aes(efficacy, selectivity), col="grey80", alpha=.5,size = .3) +
 		geom_point(data=(df.1 %>% filter(!eid %in% eids) %>% filter(lik < lik2)),
 			aes(efficacy,selectivity),col="grey80",alpha=.5,size = .3) +

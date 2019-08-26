@@ -11,11 +11,16 @@ actionButton("goButton", "Go")
 ```{r child_reactive1, context="server"}
 igo <- reactive(input$goButton)
 isym1 <- reactive(input$sym1)
+# isyms <- reactive({
+#   sym1 <- input$sym1
+#   eids <- grep(sym1,df$sym,value=T,ignore.case=T)
+# })
+
 ief1 <- reactive({
   syms <- input$sym1
   eids <- df$eid[df$sym==toupper(syms)]
   if(length(eids)==1){
-    s3readRDS(paste0("ef_all/",eids,".rds"),bucket="depmap")
+    s3readRDS(paste0("ef_all_19q2/",eids,".rds"),bucket="depmap")
   }else{
     NULL
   }
