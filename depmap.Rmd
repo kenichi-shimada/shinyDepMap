@@ -38,7 +38,7 @@ Sidebar {.sidebar}
 Column {data-width=600}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity
-```{r summary_q10_r80_1, child="rmd_depmap/efficacy_selectivity_summary_1.Rmd"}
+```{r summary_q10_r80_all, child="rmd_depmap/efficacy_selectivity_summary_all.Rmd"}
 ## remove weak points
 ## all genes -> essential or not (show efficacy.)
 ```
@@ -46,11 +46,11 @@ Column {data-width=600}
 Column {.tabset data-width=400}
 -----------------------------------------------------------------------
 ### Gene sets
-```{r gene_sets1, child="rmd_depmap/gene_sets_1.Rmd"}
+```{r gene_sets_all, child="rmd_depmap/gene_sets_all.Rmd"}
 ```
 
 ### Lineage
-```{r lineage1, child="rmd_depmap/lineage_1.Rmd"}
+```{r lineage_all, child="rmd_depmap/lineage_all.Rmd"}
 ## For gene -> gid, symbol, gene name, paralogs, coupled genes, etc
 ## for pathway and cluster
 ## beyond here, implement for cluster and gene, each.
