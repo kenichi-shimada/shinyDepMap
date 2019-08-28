@@ -1,61 +1,92 @@
 ```{r child_summary_efficacy_selectivity, context="server"}
 output$summary_efficacy_selectivity <- renderPlotly({
-	gen.path2 <- igenclust2() 
-	eid2 <- ieid2() 
-	path2 <- ipath2() 
-	clust2 <- iclust2()
-	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+	color2 <- icolor2()
 	lik2 <- ilik2()
 
-	gs2 <- igs2()
-
-	if(is.null(gen.path2)|
-		(gen.path2=="gene"&is.null(eid2))|
-		(gen.path2=="pathway"&is.null(path2))|
-		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)
-
-	if(gen.path2=="gene"){
-		eids <- eid2
-	}else if(gen.path2=="pathway"){
-		eids <- gs2
-	}else if(gen.path2=="cluster"){
-		eids <- mems$eid[mems$mem==clust2]
-	}
-
-	if(color2 %in% c("density")){
-		df.1 <- df.1 %>% arrange(d) %>% mutate(pri=d)
+	if(color2=="no gradient"){
+		df <- df %>% mutate(pri="navy")
 		col <- scale_color_identity()
 	}else if(color2=="efficacy"){
-		df.1 <- df.1 %>% arrange(desc(efficacy)) %>% mutate(pri=-efficacy)
-		col <- scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))
+		df <- df %>% mutate(pri=-efficacy)
+		col <- scale_colour_gradientn(colours = brewer.pal(9,"YlGn")[4:9])
 	}else if(color2=="selectivity"){
-		df.1 <- df.1 %>% arrange(selectivity) %>% mutate(pri=selectivity)
-		col <- scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))
+		df <- df %>% mutate(pri=selectivity)
+		col <- scale_colour_gradientn(colours = brewer.pal(9,"YlGnBu")[4:9])
 	}
 
-	p <- ggplot(df,aes(text=text)) +
+	## > thres.eff | <  lik2 : grey (back)
+	## < thres.eff & > lik2 : color
+
+	df.0 <- df
+
+	p <- ggplot(df.0,aes(text=text)) +
 		geom_vline(xintercept=thres.eff) +
-		geom_point(data=(df.0),aes(efficacy, selectivity), col="grey80", alpha=.5,size = .3) +
-		geom_point(data=(df.1 %>% filter(!eid %in% eids) %>% filter(lik < lik2)),
-			aes(efficacy,selectivity),col="grey80",alpha=.5,size = .3) +
-		geom_point(data=(df.1 %>% filter(!eid %in% eids) %>% filter(lik >= lik2)),
-			aes(efficacy, selectivity, col=pri), size = .5) +
-		col +
-		geom_point(data=(df.1 %>% filter(eid %in% eids) %>% filter(lik < lik2)),
-			aes(efficacy,selectivity),col="grey50",size=1) +
-		geom_point(data=(df.1 %>% filter(eid %in% eids) %>% filter(lik >= lik2)),
-			aes(efficacy,selectivity),col="red",size=1) +
+		geom_hline(yintercept=1) +
+		geom_point(data=(df.0 %>% filter(!is.ess | lik < lik2 )),
+			aes(efficacy, selectivity), col="grey80", alpha=.5,size = .3) +
+		geom_point(data=(df.0 %>% filter(is.ess & lik >= lik2)),
+			aes(efficacy, selectivity, col=pri), size = .5) + col +
+		geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=2) + # 5th trace, lik < lik2
+		geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=2) + # 6th trace, lik >= lik2
 		theme_bw() +
-		# xlim(xl[1],xl[2]) +
-		# ylim(yl[1],yl[2]) +
 	    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 	      axis.text=element_text(size=10),axis.title=element_text(size=10),
 	      plot.title=element_text(size=10),
 	      axis.text.x = element_text(angle = 0))
 	ply <- ggplotly(p,tooltip="text")
+	for(i in 1:3)ply$x$data[[i]]$hoverinfo <- "none"
 	ply
 })
+
+observeEvent(toListen(),{
+	## eids & < lik2 : grey (plotlyProxy)
+	## eids & > lik : red (plotlyProxy)
+	gen.path2 <- input$ess_gen_clust ## gene, orthogroup
+
+	eid2 <- input$eid2
+	path2 <- input$path2
+	clust2 <- input$clust2
+
+	if(is.null(gen.path2)|
+		(gen.path2=="gene"&is.null(eid2))|
+		(gen.path2=="pathway"&is.null(path2))|
+		(gen.path2=="cluster"&is.null(clust2))){
+		return(NULL)
+	}else if(gen.path2=="gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+	    gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
+	df.0 <- df %>% filter(is.ess) %>% filter(eid %in% eids)
+
+	if(nrow(df.0)==0)return(NULL)
+
+	df.1 <- df.0 %>% filter(lik < lik2)
+	df.2 <- df.0 %>% filter(lik >= lik2)
+
+	if(nrow(df.1)==1)df.1 <- rbind(df.1,df.1)
+	if(nrow(df.2)==1)df.2 <- rbind(df.2,df.2)
+	# warning(df.1$eff)
+	# warning(df.2$eff)
+
+	col.neg <- ifelse(nrow(df.1)>0,'rgba(127,127,127,1)','rgba(127,127,127,0)')
+	col.pos <- ifelse(nrow(df.2)>0,'rgba(255,0,0,1)','rgba(255,0,0,0)')
+
+	plotlyProxy('summary_efficacy_selectivity') %>%
+	 	plotlyProxyInvoke("restyle", 
+	        	list(x = list(df.1$efficacy), 
+	        		y = list(df.1$selectivity),
+	        		marker=list(color=col.neg,size=10)),4) %>%
+		plotlyProxyInvoke("restyle", 
+	        	list(x = list(df.2$efficacy), 
+	        		y = list(df.2$selectivity),
+        			marker=list(color=col.pos,size=10)),5)
+})
+
 ```
 ```{r}
 plotlyOutput('summary_efficacy_selectivity')

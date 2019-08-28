@@ -1,38 +1,65 @@
 ```{r child_summary_efficacy_selectivity1, context="server"}
 output$summary_efficacy_selectivity1 <- renderPlotly({
-	go <- igo()
-	syms <- isolate(isym1())
-
-	if(syms==""){
-		eids <- ""
-	}else{
-		grep.syms <- grepl(paste0("^",syms),df$sym,ignore.case=T)
-		eids <- df$eid[grep.syms]
-	}
-	
-	df <- df %>% arrange(d) %>% mutate(pri=d)
-	col <- scale_color_identity()
-
 	p <- ggplot(df,aes(text=text)) +
 		geom_vline(xintercept=thres.eff) +
-		# geom_vline(yintercept=thres.sel) +
-		geom_point(data=(df %>% filter(!eid %in% eids)),
-			aes(efficacy, selectivity, col=pri), size = .5) +
-		col +
+		geom_hline(yintercept=1) +
+		geom_point(data=df,aes(efficacy, selectivity, col=d), size = .5) +
+		scale_color_identity() + 
 		theme_bw() +
 		# xlim(xl[1],xl[2]) +
 		# ylim(yl[1],yl[2]) +
 	    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 	      axis.text=element_text(size=10),axis.title=element_text(size=10),
 	      plot.title=element_text(size=10),
-	      axis.text.x = element_text(angle = 0))
-    if(sum(df$eid %in% eids)>0){
-		p <- p + geom_point(data=(df %>% filter(eid %in% eids)),
-			aes(efficacy,selectivity),col="red",size=1)
-    }
+	      axis.text.x = element_text(angle = 0)) +
+		geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym1
+		geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym10
 	ply <- ggplotly(p,tooltip="text")
+	# ndata <- length(ply$x$data)
+	# warning(ndata)
+	# for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
+	# warning(paste(sapply(ply$x$data,function(x)length(x$text))[401:422],collapse=", "))
+    # ply$x$data[[ndata]]$text <- coef.1$text
 	ply
 })
+
+observeEvent(input$goButton, {
+	syms1 <- input$sym1
+	grep.syms1 <- grepl(paste0("^",syms1),df$sym,ignore.case=T)
+	if(any(grep.syms1)){
+		df.1 <- df[grep.syms1,]
+		i.syms10 <- which(grep.syms1)[1]
+		# warning(i.syms10)
+		df.2 <- df[rep(i.syms10,2),]
+		plotlyProxy('summary_efficacy_selectivity1') %>%
+	        plotlyProxyInvoke("restyle", 
+	        	list(x = list(df.1$efficacy), 
+	        		y = list(df.1$selectivity),
+	        		marker=list(color='rgba(255,128,0,1)',size=8)),
+	        	list(421)) %>%
+	        plotlyProxyInvoke("restyle", 
+	        	list(x = list(df.2$efficacy), 
+	        		y = list(df.2$selectivity),
+	        		marker=list(color='rgba(255,0,0,1)',size=15)),
+	        	list(422))
+    }
+})
+
+observeEvent(input$sym10, {
+	syms10 <- input$sym10
+	if(syms10!="" && any(df$sym==syms10)){
+		i.syms10 <- which(df$sym==syms10)
+		df.2 <- df[rep(i.syms10,2),]
+		# warning(df.2$eff)
+		plotlyProxy('summary_efficacy_selectivity1') %>%
+	        plotlyProxyInvoke("restyle", 
+	        	list(x = list(df.2$efficacy), 
+	        		y = list(df.2$selectivity),
+	        		marker=list(color='rgba(255,0,0,1)',size=15)),
+	        	list(422))
+	    }
+})
+
 ```
 ```{r}
 plotlyOutput('summary_efficacy_selectivity1')

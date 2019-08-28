@@ -1,15 +1,8 @@
-```{r child_lineage1, context="server"}
-# output$probe_input_cross <- renderUI({ ## in response to symbol, get the probe
-#   this.set <- probes.lst.1[[isym1()]]
-#   selectInput("probe_cross", "Probe (in rat230_2 array):",
-#               choices = this.set,selected = this.set[[1]])
-# })
-# uiOutput("probe_input_cross"))
 
+```{r child_lineage1, context="server"}
 output$lineage1 <- renderPlotly({
-	go <- igo()
-	# sym2 <- isolate(isym2())
-	this.ef <- isolate(ief1())
+	syms10 <- isym10()
+	this.ef <- ief1()
 
 	if(is.null(this.ef))return(NULL);
 
@@ -38,9 +31,10 @@ output$lineage1 <- renderPlotly({
 		theme_bw() +
 		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 		  axis.text=element_text(size=8),axis.title=element_text(size=10),
-		  plot.title=element_text(size=10),
+		  plot.title=element_text(size=15, hjust=0.5),
 		  axis.text.x = element_text(angle = 0)) +
-		labs(x="",y="Efficacy score",title="")
+		ggtitle(syms10) + 
+		labs(x="",y="Combined efficacy score")
 
 	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
 	ndata <- length(ply$x$data)
@@ -48,8 +42,11 @@ output$lineage1 <- renderPlotly({
     ply$x$data[[ndata]]$text <- ef.1$text
 	ply
 })
+
 ```
 ```{r}
+# textOutput("error1")
 plotlyOutput("lineage1")
+
 ```
 

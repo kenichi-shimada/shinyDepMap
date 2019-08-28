@@ -1,19 +1,11 @@
 ```{r child_gene_sets, context="server"}
-output$gene_sets <- renderDataTable({
-	gen.path2 <- igenclust2() 
+output$gene_sets <- renderDT({
+	gen.path2 <- igenclust2()
 	eid2 <- ieid2() 
 	path2 <- ipath2() 
 	clust2 <- iclust2()
-	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
 	lik2 <- ilik2()
-
 	gs2 <- igs2()
-
-	if(is.null(gen.path2)|
-		(gen.path2=="gene"&is.null(eid2))|
-		(gen.path2=="pathway"&is.null(path2))|
-		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)
 
 	if(gen.path2=="gene"){
 		eids <- eid2
@@ -23,22 +15,29 @@ output$gene_sets <- renderDataTable({
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	dt <- mems %>% filter(eid %in% eids) %>%
-		select(eid, sym, efficacy, selectivity, mem, lik) %>%
-		`colnames<-`(c("gene.id","symbol","eff","sel","cluster","lik")) %>%
-		arrange(eff,desc(sel)) %>%
-		filter(lik >= lik2) %>%
-		datatable()
-		# datatable(extensions = 'Scroller', 
-		# 	options = list(
-		# 		rowReorder = TRUE
-		# 	  deferRender = TRUE,
-		# 	  scrollY = 200,
-		# 	  scroller = TRUE
-		# 	))
-	return(dt)
+	if(!any(mems$eid %in% eids)){
+		return(NULL)
+	}else{
+		dt <- mems %>% filter(eid %in% eids) %>%
+			select(sym.all, efficacy, selectivity, mem, lik) %>%
+			`colnames<-`(c("symbol (EntrezID)","eff","sele","cluster","likelihood"))
+
+		inds <- which(dt$likelihood >= lik2)
+		dt <- dt %>%
+			datatable(extensions = 'Scroller', 
+				options = list(
+	　　			  rowReorder = TRUE,
+				  deferRender = TRUE,
+				  scrollY = 1000,
+				  pageLength = 200,
+				  scroller = TRUE,
+				  order = list(list(2, 'asc'), list(3, 'desc'))),
+				selection=list(mode="multiple", selected=inds,target="row"),
+				editable=FALSE)
+		return(dt)
+	}
 })
 ```
 ```{r}
-dataTableOutput("gene_sets")
+DTOutput("gene_sets")
 ```

@@ -1,49 +1,28 @@
 ```{r child_tsne, context="server"}
 output$tsne <- renderPlotly({
-	gen.path2 <- igenclust2() 
-	eid2 <- ieid2() 
-	path2 <- ipath2() 
-	clust2 <- iclust2()
-	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
+	color2 <- icolor2()
 	lik2 <- ilik2()
 
-	gs2 <- igs2()
-
-	if(is.null(gen.path2)|
-		(gen.path2=="gene"&is.null(eid2))|
-		(gen.path2=="pathway"&is.null(path2))|
-		(gen.path2=="cluster"&is.null(clust2)))
-	return(NULL)
-
-	if(gen.path2=="gene"){
-		eids <- eid2
-	}else if(gen.path2=="pathway"){
-		eids <- gs2
-	}else if(gen.path2=="cluster"){
-		eids <- mems$eid[mems$mem==clust2]
-	}
-
-	if(color2 == "density"){
+	if(color2=="no gradient"){
 		mems.1 <- mems %>% arrange(d) %>% mutate(pri=d)
-		col <- scale_colour_identity()
+		col <- scale_color_identity()
 	}else if(color2=="efficacy"){
 		mems.1 <- mems %>% arrange(desc(efficacy)) %>% mutate(pri=-efficacy)
-		col <- scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))
+		col <- scale_colour_gradientn(colours = brewer.pal(9,"YlGn")[4:9])
 	}else if(color2=="selectivity"){
 		mems.1 <- mems %>% arrange(selectivity) %>% mutate(pri=selectivity)
-		col <- scale_colour_gradientn(colours = rev(brewer.pal(11,"Spectral")))
+		col <- scale_colour_gradientn(colours = brewer.pal(9,"YlGnBu")[4:9])
 	}
 
-	p <- ggplot(data=mems,aes(text=text)) +
-	    geom_point(data=(mems.1 %>% filter(!eid %in% eids) %>% filter(lik < lik2)),
-	    	aes(x,y),col="grey80",alpha=.5,size=.3) +
-	    geom_point(data=(mems.1 %>% filter(!eid %in% eids) %>% filter(lik >= lik2)),
-	    	aes(x,y,col=pri),size=.5) +
-	    col +
-	    geom_point(data=(mems.1 %>% filter(eid %in% eids) %>% filter(lik < lik2)),
-	    	aes(x,y),col="grey50",size=1) +
-	    geom_point(data=(mems.1 %>% filter(eid %in% eids) %>% filter(lik >= lik2)),
-	    	aes(x,y),col="red",size=1) +
+	## > thres.eff | <  lik2 : grey (back)
+	## < thres.eff & > lik2 : color
+
+	##
+	p <- ggplot(data=mems.1,aes(text=text)) +
+	    geom_point(data=(mems.1 %>% filter(lik < lik2)),aes(x,y),col="grey80",alpha=.5,size=.3) +
+	    geom_point(data=(mems.1 %>% filter(lik >= lik2)),aes(x,y,col=pri),size=.5) + col +
+	    geom_point(data=dummy[1,], aes(x,y), col=NA,size=1) +
+	    geom_point(data=dummy[2,],aes(x,y), col=NA,size=1) +
 		theme_bw() +
 	    theme(legend.position="none",
 			plot.margin=unit(c(0,0,0,0),"lines"),
@@ -52,7 +31,55 @@ output$tsne <- renderPlotly({
 			plot.title=element_blank(),
 			axis.ticks=element_blank())
 	ply <- ggplotly(p,tooltip="text")
+	ply$x$data[[1]]$hoverinfo <- "none"
 	ply
+})
+
+observeEvent(toListen(),{
+	## eids & < lik2 : grey (plotlyProxy)
+	## eids & > lik : red (plotlyProxy)
+	gen.path2 <- input$ess_gen_clust ## gene, orthogroup
+
+	eid2 <- input$eid2
+	path2 <- input$path2
+	clust2 <- input$clust2
+
+	if(is.null(gen.path2)|
+		(gen.path2=="gene"&is.null(eid2))|
+		(gen.path2=="pathway"&is.null(path2))|
+		(gen.path2=="cluster"&is.null(clust2))){
+		return(NULL)
+	}else if(gen.path2=="gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+	    gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
+	mems.0 <- mems %>% filter(eid %in% eids)
+
+	if(nrow(mems.0)==0)return(NULL)
+
+	mems.1 <- mems.0 %>% filter(lik < lik2)
+	mems.2 <- mems.0 %>% filter(lik >= lik2)
+
+	if(nrow(mems.1)==1)mems.1 <- rbind(mems.1,mems.1)
+	if(nrow(mems.2)==1)mems.2 <- rbind(mems.2,mems.2)
+	# warning(mems.1$eff)
+	# warning(mems.2$eff)
+
+	col.neg <- ifelse(nrow(mems.1)>0,'rgba(127,127,127,1)','rgba(127,127,127,0)')
+	col.pos <- ifelse(nrow(mems.2)>0,'rgba(255,0,0,1)','rgba(255,0,0,0)')
+
+	plotlyProxy('tsne') %>%
+	 	plotlyProxyInvoke("restyle", 
+	        	list(x = list(mems.1$x),y = list(mems.1$y),
+	        		marker=list(color=col.neg,size=10)),2) %>%
+		plotlyProxyInvoke("restyle", 
+	        	list(x = list(mems.2$x),y = list(mems.2$y),
+        			marker=list(color=col.pos,size=10)),3)
 })
 ```
 ```{r}

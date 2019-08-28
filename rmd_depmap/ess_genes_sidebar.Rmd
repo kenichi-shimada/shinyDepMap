@@ -1,31 +1,31 @@
 ```{r child_sidebar2}
+
 ## choose genes
-radioButtons("ess_gen_clust",h4("Search:"),
+radioButtons("ess_gen_clust",h4("Choose a:"),
   # choices=c("gene","pathway","cluster"),
-  choices=c("gene","cluster"),  
+  choices=c("gene","cluster","pathway","tissue specific gs"),  
   selected="gene")
 
 conditionalPanel("input.ess_gen_clust == 'gene'",
   pickerInput(
   	inputId = "eid2",
-  	label = h4("Gene:"),
-  	choices = eids.ess,
+  	label = h4("Essential gene:"),
+  	choices = c("",eids.ess),
   	options = list(`live-search` = TRUE)))
 
 conditionalPanel("input.ess_gen_clust == 'pathway'",
   pickerInput(
   	inputId = "path2",
   	label = h4("Pathway:"),
-  	choices = nm.msigdb.ess,
+  	choices = c("",nm.msigdb.ess),
   	options = list(`live-search` = TRUE)))
 
 conditionalPanel("input.ess_gen_clust == 'cluster'",
   pickerInput(
   	inputId = "clust2",
   	label = h4("Cluster:"),
-  	choices = 1:180,
+  	choices = c("",1:292),
   	options = list(`live-search` = FALSE)))
-
 
 ## highlight cluster by some colors
 
@@ -36,7 +36,7 @@ sliderInput("lik2",h5("Cluster consistency (Likelihood):"),
   min=0,max=1,round=-1,value=0.4)
 
 selectInput("color_code2",h5("Color coded by:"),
-  choices=c("density","efficacy","selectivity"),
+  choices=c("selectivity","efficacy","no gradient"),
   selected="selectivity")
 
 ```
@@ -49,8 +49,15 @@ iclust2 <- reactive(input$clust2)
 icolor2 <- reactive(input$color_code2)
 ilik2 <- reactive(input$lik2)
 
+toListen <- reactive({
+  list(input$ess_gen_clust,
+    input$eid2,
+    input$path2,
+    input$clust2)
+})
+
 ief2 <- reactive({
-  if(is.null(input$eid2)){
+  if(is.null(input$eid2)|input$eid2==""){
     NULL
   }else{
     s3readRDS(paste0("ef_all_19q2/",input$eid2,".rds"),bucket="depmap")
@@ -58,7 +65,7 @@ ief2 <- reactive({
 })
 
 icoef2 <- reactive({
-  if(is.null(input$eid2)){
+  if(is.null(input$eid2)|input$eid2==""){
     NULL
   }else{
       s3readRDS(paste0("coef_ess_19q2/",input$eid2,".rds"),bucket="depmap")
@@ -66,7 +73,7 @@ icoef2 <- reactive({
 })
 
 igs2 <- reactive({
-  if(is.null(input$path2)){
+  if(is.null(input$path2)|input$path2==""){
     NULL
   }else{
     s3readRDS(paste0("msigdb_ess_19q2/",input$path2,".rds"),bucket="depmap")

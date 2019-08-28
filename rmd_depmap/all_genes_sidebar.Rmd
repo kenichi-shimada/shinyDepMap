@@ -2,22 +2,41 @@
 ## choose genes
 textInput(
 	inputId = "sym1",
-	label = h4("Gene symbol:"),
+	label = h4("Gene (Prefix search):"),
   value = "",
-  placeholder="Full or partial name")
+  placeholder="Type a full or partial gene name")
 actionButton("goButton", "Go")
+
+HTML("<hr>")
+uiOutput("gene_subset")
+
 ```
 
 ```{r child_reactive1, context="server"}
 igo <- reactive(input$goButton)
 isym1 <- reactive(input$sym1)
-# isyms <- reactive({
-#   sym1 <- input$sym1
-#   eids <- grep(sym1,df$sym,value=T,ignore.case=T)
-# })
+
+output$gene_subset <- renderUI({ ## in response to symbol, get the probe
+  go <- igo()
+  sym1 <- isolate(isym1())
+  # this.set <- df$eid[grep(paste0("^",sym1),df$sym,ignore.case=T)]
+  # names(this.set) <- grep(paste0("^",sym1),df$sym,ignore.case=T,value=T)
+  this.set <- grep(paste0("^",sym1),df$sym,ignore.case=T,value=T)
+  if(sym1==""){
+    return(NULL)
+  }else{
+    pickerInput(
+      inputId = "sym10",
+      label = h5("Choose one gene:"),
+      choices = this.set,
+      options = list(`live-search` = TRUE))
+  }
+})
+
+isym10 <- reactive(input$sym10)
 
 ief1 <- reactive({
-  syms <- input$sym1
+  syms <- input$sym10
   eids <- df$eid[df$sym==toupper(syms)]
   if(length(eids)==1){
     s3readRDS(paste0("ef_all_19q2/",eids,".rds"),bucket="depmap")

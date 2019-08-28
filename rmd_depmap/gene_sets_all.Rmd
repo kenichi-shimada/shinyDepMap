@@ -2,6 +2,7 @@
 output$gene_sets1 <- renderDataTable({
 	go <- igo()
 	syms <- isolate(isym1())
+	syms10 <- isym10()
 
 	if(syms=="")return(NULL)
 	eids <- df$eid[grep(paste0("^",syms),df$sym,ignore.case=T)]
@@ -9,15 +10,21 @@ output$gene_sets1 <- renderDataTable({
 	dt <- df %>% filter(eid %in% eids) %>%
 		select(eid, sym, efficacy, selectivity) %>%
 		`colnames<-`(c("gene.id","symbol","eff","sel")) %>%
-		arrange(eff,desc(sel)) %>%
-		datatable()
-		# datatable(extensions = 'Scroller', 
-		# 	options = list(
-		# 		rowReorder = TRUE
-		# 	  deferRender = TRUE,
-		# 	  scrollY = 200,
-		# 	  scroller = TRUE
-		# 	))
+		arrange(eff,desc(sel))
+
+	ind <- which(dt$symbol==syms10)
+
+	dt <- dt %>%
+		datatable(extensions = 'Scroller', 
+			options = list(
+　　			  rowReorder = TRUE,
+			  deferRender = TRUE,
+			  scrollY = 1000,
+			  pageLength=200,
+			  scroller = TRUE,
+			  order = list(list(3, 'asc'), list(4, 'desc'))),
+			selection=list(mode="single", selected=ind,target="row"),
+			editable=FALSE)
 	return(dt)
 })
 ```
