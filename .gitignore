@@ -2,6 +2,8 @@
 .DS_Store
 *.rda
 archive
+archives
+rmd_depmap/archives
 rsconnect
 run_shinyapp_new.R
 
