@@ -25,9 +25,15 @@ library(aws.s3)
 
 ```{r global, context="data"}
 x <- load("data/depmap_initial_19q2.rda")
+df$text[df$non.sig] <- ""
+df$lik[is.na(df$lik)] <- -1
+df$mem[is.na(df$mem)] <- -1
+
+dummy <- data.frame(efficacy=c(0,0.1),selectivity=c(0,0.1),x=c(0,0.1),y=c(0,0.1),text="")
+
 ```
 
-All genes
+<!-- All genes
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
@@ -38,6 +44,7 @@ Sidebar {.sidebar}
 Column {data-width=600}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity
+
 ```{r summary_q10_r80_all, child="rmd_depmap/efficacy_selectivity_summary_all.Rmd"}
 ## remove weak points
 ## all genes -> essential or not (show efficacy.)
@@ -56,7 +63,7 @@ Column {.tabset data-width=400}
 ## beyond here, implement for cluster and gene, each.
 ### 4. associated lineage information 
 ```
-
+ -->
 
 Essential genes
 ============================================================================
@@ -74,7 +81,7 @@ Column {data-width=500}
 ## all genes -> essential or not (show efficacy.)
 ```
 
-### tSNE (1841 essential genes)
+### tSNE (2,308 essential genes)
 ```{r rtsne, child="rmd_depmap/rtsne.Rmd"}
 ## color efficacy, selectivity, cluster, correlation (to gene), likelihood (if cluster), 
 ## change margin, remove title
@@ -106,4 +113,5 @@ Column {.tabset data-width=500}
 
 About
 ============================================================================
-Please contact [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu) for questions about the information on this website.
+This Shiny app has been made and maintained by [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu), based on 19q2 release of [DepMap](http://depmap.org) data.
+
