@@ -1,39 +1,51 @@
 ```{r child_sidebar2}
 
 ## choose genes
-radioButtons("ess_gen_clust",h4("Choose a:"),
-  # choices=c("gene","pathway","cluster"),
-  choices=c("gene","cluster","pathway","tissue specific gs"),  
-  selected="gene")
+radioButtons("ess_gen_clust",h4("Choose from:"),
+  choices=c("essential gene","cluster","pathway"),  
+  # choices=c("essential gene","cluster","pathway","tissue specific gs"),  
+  selected="essential gene")
 
-conditionalPanel("input.ess_gen_clust == 'gene'",
+conditionalPanel("input.ess_gen_clust == 'essential gene'",
   pickerInput(
   	inputId = "eid2",
-  	label = h4("Essential gene:"),
+  	label = h5("Essential gene:"),
   	choices = c("",eids.ess),
-  	options = list(`live-search` = TRUE)))
+  	options = list(`live-search` = TRUE))
+)
 
 conditionalPanel("input.ess_gen_clust == 'pathway'",
   pickerInput(
   	inputId = "path2",
-  	label = h4("Pathway:"),
+  	label = h5("Pathway:"),
   	choices = c("",nm.msigdb.ess),
-  	options = list(`live-search` = TRUE)))
+  	options = list(`live-search` = TRUE))
+)
 
 conditionalPanel("input.ess_gen_clust == 'cluster'",
   pickerInput(
   	inputId = "clust2",
-  	label = h4("Cluster:"),
+  	label = h5("Cluster:"),
   	choices = c("",1:292),
-  	options = list(`live-search` = FALSE)))
+  	options = list(`live-search` = FALSE))
+)
+
+conditionalPanel("input.ess_gen_clust == 'tissue specific'",
+  pickerInput(
+    inputId = "tis2",
+    label = h5("Tissue:"),
+    choices = c("",dis),
+    options = list(`live-search` = FALSE))
+)
 
 ## highlight cluster by some colors
+uiOutput("gene_subset2")
 
 ## 0. sidebar (highlight)
 HTML("<hr>")
 
 sliderInput("lik2",h5("Cluster consistency (Likelihood):"),
-  min=0,max=1,round=-1,value=0.4)
+  min=0,max=1,round=-1,value=0)
 
 selectInput("color_code2",h5("Color coded by:"),
   choices=c("selectivity","efficacy","no gradient"),
@@ -44,37 +56,99 @@ selectInput("color_code2",h5("Color coded by:"),
 ```{r child_reactive2, context="server"}
 igenclust2 <- reactive(input$ess_gen_clust) ## gene, orthogroup
 ieid2 <- reactive(input$eid2)
+ieid20 <- reactive(input$eid20)
 ipath2 <- reactive(input$path2)
 iclust2 <- reactive(input$clust2)
 icolor2 <- reactive(input$color_code2)
 ilik2 <- reactive(input$lik2)
 
 toListen <- reactive({
-  list(input$ess_gen_clust,
-    input$eid2,
-    input$path2,
-    input$clust2)
+  list(
+    input$ess_gen_clust, # gen.path2
+    input$eid2, # eid2
+    input$path2, # path2
+    input$clust2 # clust2
+    )
+})
+
+output$gene_subset2 <- renderUI({ ## in response to symbol, get the probe
+  gen.path2 <- igenclust2()
+  path2 <- ipath2()
+  clust2 <- iclust2()
+  lik2 <- ilik2()
+
+  if((!gen.path2 %in% c("cluster","pathway"))||
+     (gen.path2=="cluster"&clust2=="")||
+     (gen.path2=="pathway"&path2=="")) {
+    return(NULL)
+  }else{
+    eids <- define.eids.or.null(gen.path2,"",path2,clust2)
+    this.set <- eids.ess[eids.ess %in% eids]
+    this.liks <- mems$lik[match(this.set,mems$eid)]
+    this.set <- this.set[this.liks > lik2]
+    pickerInput(
+      inputId = "eid20",
+      label = h5("Pick one gene:"),
+      choices = this.set,
+      options = list(`live-search` = TRUE))
+  }
+})
+
+igene2 <- reactive({
+  if(is.null(input$ess_gen_clust)||
+    ( input$ess_gen_clust =="essential gene"&&(is.null(input$eid2)||input$eid2=="")) ||
+    ( input$ess_gen_clust =="pathway"&&(is.null(input$eid20)||input$eid20=="")) ||
+    ( input$ess_gen_clust =="cluster"&&(is.null(input$eid20)||input$eid20==""))) {
+      return(NULL)
+  }else if(input$ess_gen_clust=="essential gene"){
+    this.eid <- input$eid2
+  }else if(input$ess_gen_clust=="pathway"){
+    this.eid <- input$eid20
+  }else if(input$ess_gen_clust=="cluster"){
+    this.eid <- input$eid20
+  }
+  return(this.eid)
 })
 
 ief2 <- reactive({
-  if(is.null(input$eid2)|input$eid2==""){
-    NULL
-  }else{
-    s3readRDS(paste0("ef_all_19q2/",input$eid2,".rds"),bucket="depmap")
+  # warning(input$ess_gen_clust)
+  # warning(input$eid2)
+  # warning(input$eid20)  
+  if(input$ess_gen_clust %in% c("cluster","pathway")){
+    if(is.null(input$eid20)||input$eid20==""){
+      return(NULL)
+    }else{
+      s3readRDS(paste0("ef_all_19q2/",input$eid20,".rds"),bucket="depmap")
+    }
+  }else if(input$ess_gen_clust == "essential gene"){
+    if(is.null(input$eid2)||input$eid2==""){
+      return(NULL)
+    }else{
+      s3readRDS(paste0("ef_all_19q2/",input$eid2,".rds"),bucket="depmap")
+    }
   }
 })
 
 icoef2 <- reactive({
-  if(is.null(input$eid2)|input$eid2==""){
-    NULL
-  }else{
+  if(input$ess_gen_clust %in% c("cluster","pathway")){
+    if(is.null(input$eid20)||input$eid20==""){
+      return(NULL)
+    }else{
+      s3readRDS(paste0("coef_ess_19q2/",input$eid20,".rds"),bucket="depmap")
+    }
+  }else if(input$ess_gen_clust == "essential gene"){
+    if(is.null(input$eid2)||input$eid2==""){
+      return(NULL)
+    }else{
       s3readRDS(paste0("coef_ess_19q2/",input$eid2,".rds"),bucket="depmap")
+    }
   }
 })
 
+
 igs2 <- reactive({
   if(is.null(input$path2)|input$path2==""){
-    NULL
+    return(NULL)
   }else{
     s3readRDS(paste0("msigdb_ess_19q2/",input$path2,".rds"),bucket="depmap")
   }

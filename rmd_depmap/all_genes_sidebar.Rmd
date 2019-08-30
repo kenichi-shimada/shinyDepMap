@@ -19,8 +19,6 @@ isym1 <- reactive(input$sym1)
 output$gene_subset <- renderUI({ ## in response to symbol, get the probe
   go <- igo()
   sym1 <- isolate(isym1())
-  # this.set <- df$eid[grep(paste0("^",sym1),df$sym,ignore.case=T)]
-  # names(this.set) <- grep(paste0("^",sym1),df$sym,ignore.case=T,value=T)
   this.set <- grep(paste0("^",sym1),df$sym,ignore.case=T,value=T)
   if(sym1==""){
     return(NULL)

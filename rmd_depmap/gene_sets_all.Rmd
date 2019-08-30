@@ -4,28 +4,35 @@ output$gene_sets1 <- renderDataTable({
 	syms <- isolate(isym1())
 	syms10 <- isym10()
 
-	if(syms=="")return(NULL)
-	eids <- df$eid[grep(paste0("^",syms),df$sym,ignore.case=T)]
+	# warning(syms)
+	# warning(is.null(syms10))
+	# warning(!grepl(syms,syms10))
 
-	dt <- df %>% filter(eid %in% eids) %>%
-		select(eid, sym, efficacy, selectivity) %>%
-		`colnames<-`(c("gene.id","symbol","eff","sel")) %>%
-		arrange(eff,desc(sel))
+	if(syms=="" || is.null(syms10) || !grepl(syms,syms10,ignore.case=T)){
+		return(NULL)
+	}else{
+		eids <- df$eid[grep(paste0("^",syms),df$sym,ignore.case=T)]
+		dt <- df %>% 
+			filter(eid %in% eids) %>%
+			select(eid, sym, efficacy, selectivity) %>%
+			`colnames<-`(c("gene.id","symbol","eff","sel")) %>%
+			arrange(eff,desc(sel))
 
-	ind <- which(dt$symbol==syms10)
+		ind <- which(dt$symbol==syms10)
 
-	dt <- dt %>%
-		datatable(extensions = 'Scroller', 
-			options = list(
-　　			  rowReorder = TRUE,
-			  deferRender = TRUE,
-			  scrollY = 1000,
-			  pageLength=200,
-			  scroller = TRUE,
-			  order = list(list(3, 'asc'), list(4, 'desc'))),
-			selection=list(mode="single", selected=ind,target="row"),
-			editable=FALSE)
-	return(dt)
+		dt <- dt %>%
+			datatable(extensions = 'Scroller', 
+				options = list(
+	　　			  rowReorder = TRUE,
+				  deferRender = TRUE,
+				  scrollY = 1000,
+				  pageLength=200,
+				  scroller = TRUE,
+				  order = list(list(3, 'asc'), list(4, 'desc'))),
+				selection=list(mode="single", selected=ind, target="row"),
+				editable=FALSE)
+		return(dt)
+	}
 })
 ```
 ```{r}

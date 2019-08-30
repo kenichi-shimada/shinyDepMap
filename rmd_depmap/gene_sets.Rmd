@@ -5,35 +5,71 @@ output$gene_sets <- renderDT({
 	path2 <- ipath2() 
 	clust2 <- iclust2()
 	lik2 <- ilik2()
-	gs2 <- igs2()
+	gs2 <- isolate(igs2())
 
-	if(gen.path2=="gene"){
-		eids <- eid2
-	}else if(gen.path2=="pathway"){
-		eids <- gs2
-	}else if(gen.path2=="cluster"){
-		eids <- mems$eid[mems$mem==clust2]
-	}
+	# warning(gen.path2)
+	# warning(class(gen.path2))
+	# warning(length(gen.path2))
 
-	if(!any(mems$eid %in% eids)){
+	# warning(eid2)
+	# warning(class(eid2))
+	# warning(length(eid2))
+
+	# warning(path2)
+	# warning(class(path2))
+	# warning(length(path2))
+
+	# warning(clust2)
+	# warning(class(clust2))
+	# warning(length(clust2))
+
+	# warning(lik2)
+	# warning(class(lik2))
+	# warning(length(lik2))
+
+	# warning(gs2)
+	# warning(class(gs2))
+	# warning(length(gs2))
+
+
+	# if(eid2=="" || is.null(syms10) || !grepl(syms,syms10,ignore.case=T)){
+	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
+
+	# warning("test")
+	if(is.null(eids)||!any(mems$eid %in% eids)){
 		return(NULL)
 	}else{
 		dt <- mems %>% filter(eid %in% eids) %>%
 			select(sym.all, efficacy, selectivity, mem, lik) %>%
 			`colnames<-`(c("symbol (EntrezID)","eff","sele","cluster","likelihood"))
 
-		inds <- which(dt$likelihood >= lik2)
-		dt <- dt %>%
-			datatable(extensions = 'Scroller', 
-				options = list(
-	　　			  rowReorder = TRUE,
-				  deferRender = TRUE,
-				  scrollY = 1000,
-				  pageLength = 200,
-				  scroller = TRUE,
-				  order = list(list(2, 'asc'), list(3, 'desc'))),
-				selection=list(mode="multiple", selected=inds,target="row"),
-				editable=FALSE)
+		if(gen.path2=="cluster"){
+			inds <- which(dt$likelihood >= lik2)
+			dt <- dt %>%
+				datatable(extensions = 'Scroller', 
+					options = list(
+		　　			  rowReorder = TRUE,
+					  deferRender = TRUE,
+					  scrollY = 1000,
+					  pageLength = 200,
+					  scroller = TRUE,
+					  order = list(list(2, 'asc'), list(3, 'desc'))),
+					selection=list(mode="multiple", selected=inds,target="row"),
+					editable=FALSE)
+		}else{
+			dt <- dt %>%
+				datatable(extensions = 'Scroller', 
+					options = list(
+		　　			  rowReorder = TRUE,
+					  deferRender = TRUE,
+					  scrollY = 1000,
+					  pageLength = 200,
+					  scroller = TRUE,
+					  order = list(list(2, 'asc'), list(3, 'desc'))),
+					selection=list(mode="none"),
+					editable=FALSE)
+
+		}
 		return(dt)
 	}
 })

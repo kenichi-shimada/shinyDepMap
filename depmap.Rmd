@@ -1,5 +1,5 @@
 ---
-title: "ShinyDepMap"
+title: "shinyDepMap"
 runtime: shiny_prerendered
 output: 
   flexdashboard::flex_dashboard:
@@ -25,20 +25,13 @@ library(aws.s3)
 
 ```{r global, context="data"}
 x <- load("data/depmap_initial_19q2.rda")
-df$text[df$non.sig] <- ""
-df$lik[is.na(df$lik)] <- -1
-df$mem[is.na(df$mem)] <- -1
-
-dummy <- data.frame(efficacy=c(0,0.1),selectivity=c(0,0.1),x=c(0,0.1),y=c(0,0.1),text="")
-
 ```
 
-<!-- All genes
+All genes
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 ```{r sidebar1, child="rmd_depmap/all_genes_sidebar.Rmd"}
-## 0. sidebar (highlight)
 ```
 
 Column {data-width=600}
@@ -46,8 +39,6 @@ Column {data-width=600}
 ### Efficacy/Selectivity
 
 ```{r summary_q10_r80_all, child="rmd_depmap/efficacy_selectivity_summary_all.Rmd"}
-## remove weak points
-## all genes -> essential or not (show efficacy.)
 ```
 
 Column {.tabset data-width=400}
@@ -58,38 +49,24 @@ Column {.tabset data-width=400}
 
 ### Lineage
 ```{r lineage_all, child="rmd_depmap/lineage_all.Rmd"}
-## For gene -> gid, symbol, gene name, paralogs, coupled genes, etc
-## for pathway and cluster
-## beyond here, implement for cluster and gene, each.
-### 4. associated lineage information 
 ```
- -->
+
 
 Essential genes
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 ```{r sidebar2, child="rmd_depmap/ess_genes_sidebar.Rmd"}
-## 0. sidebar (highlight)
 ```
 
 Column {data-width=500}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity
 ```{r summary_q10_r80, child="rmd_depmap/efficacy_selectivity_summary.Rmd"}
-## remove weak points
-## all genes -> essential or not (show efficacy.)
 ```
 
 ### tSNE (2,308 essential genes)
 ```{r rtsne, child="rmd_depmap/rtsne.Rmd"}
-## color efficacy, selectivity, cluster, correlation (to gene), likelihood (if cluster), 
-## change margin, remove title
-## gene -> cluster -> highlight both
-## add correlation
-
-## gene -> cluster -> show cluster members/enriched pathways
-## pathways -> show enriched clusters
 ```
 
 Column {.tabset data-width=500}
@@ -100,18 +77,13 @@ Column {.tabset data-width=500}
 
 ### Lineage
 ```{r lineage, child="rmd_depmap/lineage.Rmd"}
-## For gene -> gid, symbol, gene name, paralogs, coupled genes, etc
-## for pathway and cluster
-## beyond here, implement for cluster and gene, each.
-### 4. associated lineage information 
 ```
 
 ### Inter-cluster correlation
 ```{r Inter_cluster, child="rmd_depmap/inter_cluster.Rmd"}
-### 5. inter-cluster correlation (heatmap)
 ```
 
 About
 ============================================================================
-This Shiny app has been made and maintained by [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu), based on 19q2 release of [DepMap](http://depmap.org) data.
+This Shiny app has been made based on 19q2 release of [DepMap](http://depmap.org) data, and maintained by [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu).
 

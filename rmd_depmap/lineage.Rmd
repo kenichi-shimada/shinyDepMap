@@ -1,27 +1,15 @@
 ```{r child_lineage, context="server"}
 output$lineage <- renderPlotly({
-	gen.path2 <- igenclust2() 
-	eid2 <- ieid2() 
-	path2 <- ipath2() 
-	clust2 <- iclust2()
-	color2 <- icolor2() #c("gene,pathway","cluster","efficacy","selectivity"),
-
+	this.eid <- igene2()
 	this.ef <- ief2()
-	gs2 <- igs2()
 
-	if(is.null(gen.path2)|(gen.path2=="gene"&is.null(eid2))){
-		return(NULL)
-	}else if(gen.path2 %in% c("pathway","cluster")){
-		stop("Choose a single gene (not pathway or cluster) to show this plot.")
-	}
+	# warning(this.eid)
+	# warning(this.ef)
 
-	# if(gen.path2=="gene"){
-	# 	eids <- eid2
-	# }else if(gen.path2=="pathway"){
-	# 	eids <- gs2
-	# }else if(gen.path2=="cluster"){
-	# 	eids <- mems$eid[mems$mem==clust2]
-	# }
+	if(is.null(this.eid)|| this.eid =="" || is.null(this.ef)||this.ef=="")return(NULL)
+
+	this.sym <- df.0$sym.all[df.0$eid==this.eid]
+	warning(this.sym)
 
 	ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
 		left_join(cl.info,by="DepMap_ID") %>%
@@ -48,15 +36,16 @@ output$lineage <- renderPlotly({
 		theme_bw() +
 		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
 		  axis.text=element_text(size=8),axis.title=element_text(size=10),
-		  plot.title=element_text(size=10),
+		  plot.title=element_text(size=15, hjust=0.5),
 		  axis.text.x = element_text(angle = 0)) +
-		labs(x="",y="Efficacy score",title="")
+		ggtitle(this.sym) + 
+		labs(x="",y="Efficacy score")
 
 	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
 	ndata <- length(ply$x$data)
 	for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
     ply$x$data[[ndata]]$text <- ef.1$text
-	ply 
+	ply
 })
 ```
 ```{r}
