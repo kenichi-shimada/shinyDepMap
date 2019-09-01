@@ -86,4 +86,3 @@ Column {.tabset data-width=500}
 About
 ============================================================================
 This Shiny app has been made based on 19q2 release of [DepMap](http://depmap.org) data, and maintained by [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu).
-

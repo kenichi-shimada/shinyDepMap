@@ -23,6 +23,7 @@ output$summary_efficacy_selectivity1 <- renderPlotly({
 
 observeEvent(input$goButton, {
 	syms1 <- input$sym1
+	syms10 <- input$sym10
 	grep.syms1 <- grepl(paste0("^",syms1),df$sym,ignore.case=T)
 
 	if(any(grep.syms1)){
@@ -31,7 +32,7 @@ observeEvent(input$goButton, {
 
 		i.syms10 <- which(grep.syms1)[1]
 
-		df.2 <- df.1[rep(1,2),]
+		df.2 <- df.1[rep(match(syms10,df.1$sym),2),]
 		plotlyProxy('summary_efficacy_selectivity1') %>%
 	        plotlyProxyInvoke("restyle", 
 	        	list(x = list(df.1$efficacy), 

@@ -22,7 +22,21 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	## > thres.eff | <  lik2 : grey (back)
 	## < thres.eff & > lik2 : color
 
-	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
+	if(is.null(gen.path2)||
+		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+		eids <- NULL
+	}else if(gen.path2=="essential gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
+	# warning(length(eids))
 
 	p <- ggplot(df.0,aes(text=text)) +
 		geom_vline(xintercept=thres.eff, col="grey70") +
@@ -38,7 +52,7 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	      plot.title=element_text(size=10),
 	      axis.text.x = element_text(angle = 0))
 
-	if(is.null(eids)){
+	if(is.null(eids)||eids==""){
 		p <- p + 
 			geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1.2) + # 6th trace, lik < lik2
 			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1.2) # 7th trace, lik >= lik2
@@ -50,10 +64,17 @@ output$summary_efficacy_selectivity <- renderPlotly({
 		df.2 <- df.1 %>% filter(lik < lik2)
 		df.3 <- df.1 %>% filter(lik >= lik2)
 
-		p <- p +
-			geom_point(data=(df.2 %>% mutate(text="")),aes(efficacy,selectivity),col="grey20",size=1.2) + # 6th trace, lik < lik2
-			geom_point(data=df.3,aes(efficacy,selectivity),col="red",size=1.2) # 7th trace, lik >= lik2
-	}
+		# warning(nrow(df.2))
+		# warning(nrow(df.3))
+
+		if(nrow(df.2)>0){
+			p <- p +
+				geom_point(data=df.2,aes(efficacy,selectivity),col="grey50",size=1.2) # 6th trace, lik < lik2
+		}
+		if(nrow(df.3)>0){
+			p <- p +
+				geom_point(data=df.3,aes(efficacy,selectivity),col="red",size=1.2) # 7th trace, lik >= lik2
+		}	}
 	ply <- ggplotly(p,tooltip="text")
 	for(i in 1:3)ply$x$data[[i]]$hoverinfo <- "none"
 	ply
@@ -71,7 +92,20 @@ observeEvent(toListen(),{
 
 	lik2 <- input$lik2
 
-	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
+	if(is.null(gen.path2)||
+		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+		eids <- NULL
+	}else if(gen.path2=="essential gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
 	if(is.null(eids))return(NULL)
 
 	df.1 <- df.0 %>% filter(is.ess) %>% filter(eid %in% eids)

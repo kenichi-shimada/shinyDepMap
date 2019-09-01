@@ -33,29 +33,52 @@ output$gene_sets <- renderDT({
 
 
 	# if(eid2=="" || is.null(syms10) || !grepl(syms,syms10,ignore.case=T)){
-	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
+	# eids <- define.eids.or.null(gen.path2,eid2,path2,clust2,mems)
+
+	if(is.null(gen.path2)||
+		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+		eids <- NULL
+	}else if(gen.path2=="essential gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
 
 	# warning("test")
 	if(is.null(eids)||!any(mems$eid %in% eids)){
 		return(NULL)
 	}else{
 		dt <- mems %>% filter(eid %in% eids) %>%
-			select(sym.all, efficacy, selectivity, mem, lik) %>%
-			`colnames<-`(c("symbol (EntrezID)","eff","sele","cluster","likelihood"))
+			select(sym, efficacy, selectivity, mem, lik) %>%
+			arrange(efficacy,desc(selectivity)) %>%
+			mutate(sym = paste0('<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=',sym,'" target="_blank">',sym,'</a>')) %>%
+			`colnames<-`(c("Gene","Eff","Sel","Clstr","Lik"))
 
 		if(gen.path2=="cluster"){
-			inds <- which(dt$likelihood >= lik2)
 			dt <- dt %>%
+				mutate(selected = as.numeric(Lik < lik2)) %>%
 				datatable(extensions = 'Scroller', 
 					options = list(
+					  columnDefs = list(list(targets = 6, visible = FALSE)),
 		　　			  rowReorder = TRUE,
 					  deferRender = TRUE,
 					  scrollY = 1000,
 					  pageLength = 200,
 					  scroller = TRUE,
 					  order = list(list(2, 'asc'), list(3, 'desc'))),
-					selection=list(mode="multiple", selected=inds,target="row"),
-					editable=FALSE)
+					selection=list(mode="none"),
+					editable=FALSE, escape=FALSE) %>%
+ 		    formatStyle(
+			  6,
+			  target = 'row',
+			  backgroundColor = styleEqual(c(1,0), c('gray', NA))
+			)
+
 		}else{
 			dt <- dt %>%
 				datatable(extensions = 'Scroller', 
@@ -67,7 +90,7 @@ output$gene_sets <- renderDT({
 					  scroller = TRUE,
 					  order = list(list(2, 'asc'), list(3, 'desc'))),
 					selection=list(mode="none"),
-					editable=FALSE)
+					editable=FALSE, escape=FALSE)
 
 		}
 		return(dt)

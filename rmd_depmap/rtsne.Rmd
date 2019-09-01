@@ -8,6 +8,7 @@ output$tsne <- renderPlotly({
 	color2 <- icolor2()
 	lik2 <- ilik2()
 
+	
 	if(color2=="no gradient"){
 		mems.0 <- mems %>% arrange(d) %>% mutate(pri=d)
 		col <- scale_color_identity()
@@ -22,8 +23,6 @@ output$tsne <- renderPlotly({
 	## > thres.eff | <  lik2 : grey (back)
 	## < thres.eff & > lik2 : color
 
-	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
-	
 	p <- ggplot(data=mems.0,aes(text=text)) +
 	    geom_point(data=(mems.0 %>% filter(lik < lik2) %>% mutate(text="")),
 	    	aes(x,y),col="grey80",alpha=.5,size=.3) +
@@ -35,6 +34,21 @@ output$tsne <- renderPlotly({
 			axis.title=element_blank(),
 			plot.title=element_blank(),
 			axis.ticks=element_blank())
+
+	if(is.null(gen.path2)||
+		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+		eids <- NULL
+	}else 
+	if(gen.path2=="essential gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
 
 	if(is.null(eids)){
 		p <- p + 
@@ -48,13 +62,17 @@ output$tsne <- renderPlotly({
 		mems.2 <- mems.1 %>% filter(lik < lik2)
 		mems.3 <- mems.1 %>% filter(lik >= lik2)
 
-		p <- p +
-			geom_point(data=(mems.2 %>% mutate(text="")),
-				aes(efficacy,selectivity),col="grey50",size=1.2) + # 6th trace, lik < lik2
-			geom_point(data=mems.3,aes(efficacy,selectivity),col="red",size=1.2) # 7th trace, lik >= lik2
+		if(nrow(mems.2)>0){
+			p <- p +
+				geom_point(data=mems.2,aes(x,y),col="grey50",size=1.2) # 6th trace, lik < lik2
+		}
+		if(nrow(mems.3)>0){
+			p <- p +
+				geom_point(data=mems.3,aes(x,y),col="red",size=1.2) # 7th trace, lik >= lik2
+		}
 	}
+
 	ply <- ggplotly(p,tooltip="text")
-	# ply$x$data[[1]]$hoverinfo <- "none"
 	ply
 })
 
@@ -69,7 +87,22 @@ observeEvent(toListen(),{
 
 	lik2 <- input$lik2
 
-	eids <- define.eids.or.null(gen.path2,eid2,path2,clust2)
+	# eids <- define.eids.or.null(gen.path2,eid2,path2,clust2,mems)
+
+	if(is.null(gen.path2)||
+		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+		return(NULL)
+	}else if(gen.path2=="essential gene"){
+		eids <- eid2
+	}else if(gen.path2=="pathway"){
+		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+		eids <- gs2
+	}else if(gen.path2=="cluster"){
+		eids <- mems$eid[mems$mem==clust2]
+	}
+
 	if(is.null(eids))return(NULL)
 
 	mems.0 <- mems %>% filter(eid %in% eids)

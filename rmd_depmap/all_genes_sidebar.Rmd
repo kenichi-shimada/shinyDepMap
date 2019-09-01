@@ -2,7 +2,7 @@
 ## choose genes
 textInput(
 	inputId = "sym1",
-	label = h4("Gene (Prefix search):"),
+	label = h4("Gene:"),
   value = "",
   placeholder="Type a full or partial gene name")
 actionButton("goButton", "Go")
@@ -19,7 +19,12 @@ isym1 <- reactive(input$sym1)
 output$gene_subset <- renderUI({ ## in response to symbol, get the probe
   go <- igo()
   sym1 <- isolate(isym1())
-  this.set <- grep(paste0("^",sym1),df$sym,ignore.case=T,value=T)
+  this.df <- df %>% 
+    filter(grepl(paste0("^",sym1),df$sym,ignore.case=T)) %>%
+    arrange(efficacy)
+
+  this.set <- this.df$sym
+  
   if(sym1==""){
     return(NULL)
   }else{

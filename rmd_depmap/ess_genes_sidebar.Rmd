@@ -45,7 +45,7 @@ uiOutput("gene_subset2")
 HTML("<hr>")
 
 sliderInput("lik2",h5("Cluster consistency (Likelihood):"),
-  min=0,max=1,round=-1,value=0)
+  min=0,max=1,round=-1,step=.1,value=.4)
 
 selectInput("color_code2",h5("Color coded by:"),
   choices=c("selectivity","efficacy","no gradient"),
@@ -82,10 +82,23 @@ output$gene_subset2 <- renderUI({ ## in response to symbol, get the probe
      (gen.path2=="pathway"&path2=="")) {
     return(NULL)
   }else{
-    eids <- define.eids.or.null(gen.path2,"",path2,clust2)
-    this.set <- eids.ess[eids.ess %in% eids]
-    this.liks <- mems$lik[match(this.set,mems$eid)]
-    this.set <- this.set[this.liks > lik2]
+    if(is.null(gen.path2)||
+      (gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+      (gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+      eids <- NULL
+    }else if(gen.path2=="pathway"){
+      gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+      eids <- gs2
+    }else if(gen.path2=="cluster"){
+      eids <- mems$eid[mems$mem==clust2]
+    }
+
+    this.mems <- mems %>% 
+      filter(eid %in% eids & lik > lik2) %>%
+      arrange(efficacy,desc(selectivity))
+    this.set <- this.mems$eid
+    names(this.set) <- this.mems$sym
+
     pickerInput(
       inputId = "eid20",
       label = h5("Pick one gene:"),
@@ -97,14 +110,11 @@ output$gene_subset2 <- renderUI({ ## in response to symbol, get the probe
 igene2 <- reactive({
   if(is.null(input$ess_gen_clust)||
     ( input$ess_gen_clust =="essential gene"&&(is.null(input$eid2)||input$eid2=="")) ||
-    ( input$ess_gen_clust =="pathway"&&(is.null(input$eid20)||input$eid20=="")) ||
-    ( input$ess_gen_clust =="cluster"&&(is.null(input$eid20)||input$eid20==""))) {
+    ( input$ess_gen_clust %in% c("pathway","cluster") && (is.null(input$eid20)||input$eid20==""))){
       return(NULL)
   }else if(input$ess_gen_clust=="essential gene"){
     this.eid <- input$eid2
-  }else if(input$ess_gen_clust=="pathway"){
-    this.eid <- input$eid20
-  }else if(input$ess_gen_clust=="cluster"){
+  }else if(input$ess_gen_clust %in% c("pathway","cluster")){
     this.eid <- input$eid20
   }
   return(this.eid)
