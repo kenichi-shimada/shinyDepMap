@@ -12,9 +12,11 @@ output$gene_sets1 <- renderDataTable({
 		return(NULL)
 	}else{
 		eids <- df$eid[grep(paste0("^",syms),df$sym,ignore.case=T)]
+		# stop(paste(syms10,collapse=","))
+
 		dt <- df %>% 
 			filter(eid %in% eids) %>%
-			arrange(efficacy,desc(selectivity)) %>%
+			arrange(efficacy,desc(selectivity)) %>% 
 			select(sym, efficacy, selectivity) %>%
 			mutate(selected = as.numeric(sym == syms10)) %>%
 			mutate(sym = paste0('<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=',sym,'" target="_blank">',sym,'</a>')) %>%

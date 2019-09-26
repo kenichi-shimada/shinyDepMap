@@ -11,6 +11,7 @@ conditionalPanel("input.ess_gen_clust == 'essential gene'",
   	inputId = "eid2",
   	label = h5("Essential gene:"),
   	choices = c("",eids.ess),
+    selected = "",
   	options = list(`live-search` = TRUE))
 )
 
@@ -19,6 +20,7 @@ conditionalPanel("input.ess_gen_clust == 'pathway'",
   	inputId = "path2",
   	label = h5("Pathway:"),
   	choices = c("",nm.msigdb.ess),
+    selected = "",
   	options = list(`live-search` = TRUE))
 )
 
@@ -26,7 +28,8 @@ conditionalPanel("input.ess_gen_clust == 'cluster'",
   pickerInput(
   	inputId = "clust2",
   	label = h5("Cluster:"),
-  	choices = c("",1:292),
+  	choices = c("",1:362),
+    selected = "",
   	options = list(`live-search` = FALSE))
 )
 
@@ -35,6 +38,7 @@ conditionalPanel("input.ess_gen_clust == 'tissue specific'",
     inputId = "tis2",
     label = h5("Tissue:"),
     choices = c("",dis),
+    selected = "",
     options = list(`live-search` = FALSE))
 )
 
@@ -45,7 +49,7 @@ uiOutput("gene_subset2")
 HTML("<hr>")
 
 sliderInput("lik2",h5("Cluster consistency (Likelihood):"),
-  min=0,max=1,round=-1,step=.1,value=.4)
+  min=0,max=1,round=-1,step=.1,value=0)
 
 selectInput("color_code2",h5("Color coded by:"),
   choices=c("selectivity","efficacy","no gradient"),
@@ -64,12 +68,19 @@ ilik2 <- reactive(input$lik2)
 
 toListen <- reactive({
   list(
-    input$ess_gen_clust, # gen.path2
     input$eid2, # eid2
     input$path2, # path2
     input$clust2 # clust2
+    # input$lik2
     )
 })
+
+toInit <- reactive({
+  list(
+    input$ess_gen_clust # gen.path2
+    )
+})
+
 
 output$gene_subset2 <- renderUI({ ## in response to symbol, get the probe
   gen.path2 <- igenclust2()
@@ -94,7 +105,7 @@ output$gene_subset2 <- renderUI({ ## in response to symbol, get the probe
     }
 
     this.mems <- mems %>% 
-      filter(eid %in% eids & lik > lik2) %>%
+      filter(eid %in% eids & lik >= lik2) %>%
       arrange(efficacy,desc(selectivity))
     this.set <- this.mems$eid
     names(this.set) <- this.mems$sym
@@ -155,7 +166,6 @@ icoef2 <- reactive({
   }
 })
 
-
 igs2 <- reactive({
   if(is.null(input$path2)|input$path2==""){
     return(NULL)
@@ -163,5 +173,40 @@ igs2 <- reactive({
     s3readRDS(paste0("msigdb_ess_19q2/",input$path2,".rds"),bucket="depmap")
   }
 })
+
+shinyInput <- function(FUN, query, id, ...) {
+  inputs <- as.character(FUN(paste0(id, query), ...))
+}
+
+observeEvent(input$lik2,{
+  mem.1 <-  sort(as.numeric(names(which(table(mems$mem[mems$lik >= lik2])>0))))
+  syms <- mems$sym.all[mems$lik >= input$lik2 & mems$mem %in% mem.1]
+  eids.ess.1 <- eids.ess[syms]
+  updatePickerInput(session,
+    inputId = "eid2",
+    choices = c("",eids.ess.1),
+    selected ="")
+  updatePickerInput(session,
+    inputId = "clust2",
+    choices = c("",mem.1),
+    selected ="")
+}, ignoreInit = TRUE)
+
+
+observeEvent(input$select_button, {
+  this.mem <<- strsplit(input$select_button, "_")[[1]][2]
+  # Method 1
+  updateRadioButtons(session,
+    inputId="ess_gen_clust",
+      choices=c("essential gene","cluster","pathway"),  
+      selected = "cluster"
+    )
+  updatePickerInput(session,
+    inputId = "clust2",
+    choices = c("",1:362),
+    selected =this.mem)
+}, ignoreInit = TRUE)
+
+
 
 ```

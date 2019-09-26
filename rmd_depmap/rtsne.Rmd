@@ -8,7 +8,7 @@ output$tsne <- renderPlotly({
 	color2 <- icolor2()
 	lik2 <- ilik2()
 
-	
+
 	if(color2=="no gradient"){
 		mems.0 <- mems %>% arrange(d) %>% mutate(pri=d)
 		col <- scale_color_identity()
@@ -35,22 +35,26 @@ output$tsne <- renderPlotly({
 			plot.title=element_blank(),
 			axis.ticks=element_blank())
 
-	if(is.null(gen.path2)||
-		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
-		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
-		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
-		eids <- NULL
-	}else 
-	if(gen.path2=="essential gene"){
-		eids <- eid2
-	}else if(gen.path2=="pathway"){
-		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
-		eids <- gs2
-	}else if(gen.path2=="cluster"){
-		eids <- mems$eid[mems$mem==clust2]
+	if(0){
+		if(is.null(gen.path2)||
+			(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
+			(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
+			(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
+			eids <- NULL
+		}else 
+		if(gen.path2=="essential gene"){
+			eids <- eid2
+		}else if(gen.path2=="pathway"){
+			gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
+			eids <- gs2
+		}else if(gen.path2=="cluster"){
+			eids <- mems$eid[mems$mem==clust2]
+		}
+	}else{
+		eids <- ""
 	}
 
-	if(is.null(eids)){
+	if(is.null(eids)||eids[1]==""){
 		p <- p + 
 		    geom_point(data=dummy[1,], aes(x,y), col=NA,size=1) +
 		    geom_point(data=dummy[2,],aes(x,y), col=NA,size=1)
@@ -74,6 +78,20 @@ output$tsne <- renderPlotly({
 
 	ply <- ggplotly(p,tooltip="text")
 	ply
+})
+
+observeEvent(toInit(),{
+	plotlyProxy('tsne') %>%
+	 	plotlyProxyInvoke("restyle", 
+	        	list(x = list(dummy$efficacy), 
+	        		y = list(dummy$selectivity),
+	        		text = list(dummy$text),
+	        		marker=list(color='rgba(0,0,0,0)',size=6)),2) %>%
+		plotlyProxyInvoke("restyle", 
+	        	list(x = list(dummy$efficacy), 
+	        		y = list(dummy$selectivity),
+	        		text = list(dummy$text),	        		
+        			marker=list(color='rgba(0,0,0,0)',size=6)),3)
 })
 
 observeEvent(toListen(),{
@@ -103,32 +121,50 @@ observeEvent(toListen(),{
 		eids <- mems$eid[mems$mem==clust2]
 	}
 
-	if(is.null(eids))return(NULL)
+	# warning(paste(gen.path2,eid2=="",lik2,collapse=" "))
 
-	mems.0 <- mems %>% filter(eid %in% eids)
+	if(is.null(eids)||eids[1]==""){
+	}else{
+		mems.0 <- mems %>% filter(eid %in% eids)
 
-	if(nrow(mems.0)==0)return(NULL)
+		mems.1 <- mems.0 %>% filter(lik < lik2)
+		mems.2 <- mems.0 %>% filter(lik >= lik2)
 
-	mems.1 <- mems.0 %>% filter(lik < lik2)
-	mems.2 <- mems.0 %>% filter(lik >= lik2)
+		if(nrow(mems.1)==1)mems.1 <- rbind(mems.1,mems.1)
+		if(nrow(mems.2)==1)mems.2 <- rbind(mems.2,mems.2)
 
-	if(nrow(mems.1)==1)mems.1 <- rbind(mems.1,mems.1)
-	if(nrow(mems.2)==1)mems.2 <- rbind(mems.2,mems.2)
+		# warning(nrow(mems.1))
+		# warning(nrow(mems.2))
 
-	# warning(mems.1$eff)
-	# warning(mems.2$eff)
+		col.neg <- ifelse(nrow(mems.1)>0,'rgba(127,127,127,1)','rgba(127,127,127,0)')
+		col.pos <- ifelse(nrow(mems.2)>0,'rgba(255,0,0,1)','rgba(255,0,0,0)')
 
-	col.neg <- ifelse(nrow(mems.1)>0,'rgba(127,127,127,1)','rgba(127,127,127,0)')
-	col.pos <- ifelse(nrow(mems.2)>0,'rgba(255,0,0,1)','rgba(255,0,0,0)')
-
-	plotlyProxy('tsne') %>%
-	 	plotlyProxyInvoke("restyle", 
-	        	list(x = list(mems.1$x),y = list(mems.1$y), text = list(mems.1$text),
-	        		marker=list(color=col.neg,size=6)),2) %>%
-		plotlyProxyInvoke("restyle", 
-	        	list(x = list(mems.2$x),y = list(mems.2$y), text = list(mems.2$text),
-        			marker=list(color=col.pos,size=6)),3)
-})
+		pp <- plotlyProxy('tsne')
+		if(nrow(mems.1)>0){
+			pp <- pp %>%
+			 	plotlyProxyInvoke("restyle", 
+			        	list(x = list(mems.1$x),y = list(mems.1$y), text = list(mems.1$text),
+			        		marker=list(color=col.neg,size=6)),2)
+		}else{
+			pp <- pp %>%
+			 	plotlyProxyInvoke("restyle", 
+			        	list(x = list(dummy$x),y = list(dummy$y), text = list(dummy$text),
+			        		marker=list(color=col.neg,size=6)),2)
+		}
+		if(nrow(mems.2)>0){
+			pp <- pp %>%
+			 	plotlyProxyInvoke("restyle", 
+			        	list(x = list(mems.2$x),y = list(mems.2$y), text = list(mems.2$text),
+			        		marker=list(color=col.pos,size=6)),3)
+		}else{
+			pp <- pp %>%
+			 	plotlyProxyInvoke("restyle", 
+			        	list(x = list(dummy$x),y = list(dummy$y), text = list(dummy$text),
+			        		marker=list(color=col.pos,size=6)),3)
+		}
+		pp
+	}
+},ignoreInit=TRUE)
 ```
 ```{r}
 plotlyOutput('tsne')

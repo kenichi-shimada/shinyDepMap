@@ -81,6 +81,15 @@ output$gene_sets <- renderDT({
 
 		}else{
 			dt <- dt %>%
+				mutate(Clstr=sapply(Clstr,function(i){
+					if(i==0){
+						return(i)
+					}else{
+			      	shinyInput(actionButton, i, 'button_', 
+				      	label = i,
+				      	onclick = 'Shiny.onInputChange(\"select_button\",  this.id)' )
+					}
+				})) %>%
 				datatable(extensions = 'Scroller', 
 					options = list(
 		　　			  rowReorder = TRUE,
@@ -91,7 +100,6 @@ output$gene_sets <- renderDT({
 					  order = list(list(2, 'asc'), list(3, 'desc'))),
 					selection=list(mode="none"),
 					editable=FALSE, escape=FALSE)
-
 		}
 		return(dt)
 	}

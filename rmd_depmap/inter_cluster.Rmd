@@ -4,22 +4,30 @@ output$inter_cluster <- renderPlotly({
 	this.coef <- icoef2()
 	lik2 <- ilik2()
 
+	if(0){
+		this.eid <- "2879"
+		this.coef <- s3readRDS(paste0("coef_ess_19q2/2879.rds"),bucket="depmap")
+		lik2 <- 0
+	}
+
 	if(is.null(this.eid)|| this.eid =="" || is.null(this.coef)||this.coef=="")return(NULL)
 
 	this.sym <- mems$sym.all[mems$eid == this.eid]
 	this.mem <- mems$mem[mems$eid == this.eid]
 	this.lik <- mems$lik[mems$eid == this.eid]
 
-	if(this.lik < lik2){
-		txt <- paste0("The likelihood of ",this.sym," being in the cluster ",
-			this.mem," (",this.lik,") is lower than the threshold (",lik2,").",
-			" Lower the threshold to see this plot.")
-		stop(txt)
-	}
+	validate(
+		need(this.lik >= lik2,
+			paste0("The likelihood of ",this.sym," being in the cluster ",
+				this.mem," (",this.lik,") is lower than the threshold (",lik2,").",
+				" Lower the \"Cluster consistency\" to see this plot.")
+			)
+		)
 
 	coef.1 <- data.frame(coef=this.coef,eid=names(this.coef),stringsAsFactors=FALSE) %>%
 		left_join(mems,by="eid") %>% 
-		filter(lik >= lik2)
+		filter(lik >= lik2) %>%
+		filter(mem != 0)
 	# stop(paste(names(coef.1),collapse="\n"))	
 	# stop(paste(dim(coef.1),collapse="\n"))			
 	# stop(paste(sapply(coef.1,class),collpase="\n"))
@@ -30,10 +38,28 @@ output$inter_cluster <- renderPlotly({
 
 	coef.1 <- coef.1 %>% mutate(mem=factor(mem,levels=clust.levs)) 
 
-	pvio <- coef.1 %>%
-		ggplot(aes(x=mem,y=coef)) +
-		geom_violin(scale="area",aes(fill=mem,color=mem)) +
-		geom_jitter(height = 0, width = 0.1, size=.3) +
+	sum.coef.1 <- coef.1 %>% group_by(mem) %>% 
+		summarize(maxs=max(coef),mins=min(coef),mids=median(coef)) %>%
+		arrange(mids) %>%
+		mutate(mem=factor(mem,levels=clust.levs))
+
+	# pvio <- coef.1 %>%
+	# 	ggplot(aes(x=mem,y=coef)) +
+	# 	# geom_violin(scale="area",aes(fill=mem,color=mem)) +
+	# 	geom_boxplot(outlier.shape=NA,aes(colour=mem)) +
+	# 	geom_jitter(height = 0, width = 0.1, size=.3) +
+	# 	coord_flip() +
+	# 	theme_bw() +
+	# 	theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+	# 	  axis.text=element_text(size=10),axis.title=element_text(size=10),
+	# 	  plot.title=element_text(size=15, hjust=0.5),
+	# 	  axis.text.x = element_text(angle = 0)) +
+	# 	ggtitle(this.sym) + 
+	# 	labs(x="",y="Spearman correlation of genes")
+
+	pvio <- ggplot(sum.coef.1, aes(x=mem,y=mids,color=mem)) +
+		geom_linerange(aes(ymin=mins,ymax=maxs))+
+		geom_jitter(data=coef.1,aes(x=mem,y=coef),height = 0, width = 0.1, size=.3,color=1) +
 		coord_flip() +
 		theme_bw() +
 		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
