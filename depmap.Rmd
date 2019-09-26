@@ -10,10 +10,7 @@ output:
 
 ```{r setup, context="setup",include=FALSE}
 library(shiny) ## shiny
-library(dplyr)
 library(flexdashboard) # devtools::install_github('rstudio/flexdashboard')
-library(tidyr)
-library(tibble)
 library(ggplot2) # devtools::install_github('hadley/ggplot2')
 library(grid)
 library(RColorBrewer)
@@ -21,6 +18,9 @@ library(shinyWidgets)
 library(plotly)
 library(DT)
 library(aws.s3)
+library(tibble)
+library(dplyr)
+library(tidyr)
 ```
 
 ```{r global, context="data"}
