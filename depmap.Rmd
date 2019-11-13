@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, context="setup",include=FALSE}
-library(shiny) ## shiny
+library(shiny) 
 library(flexdashboard) # devtools::install_github('rstudio/flexdashboard')
 library(ggplot2) # devtools::install_github('hadley/ggplot2')
 library(grid)
@@ -27,70 +27,67 @@ library(tidyr)
 ```{r global, context="data"}
 # setwd("/Users/ks389/Dropbox (HMS)/projects/hop_depmap/shiny_DepMap/run_19q3/")
 x <- load("data/depmap_initial_19q3.rda")
-# debug
-# C1 = "54" -> C2 = "0", C3 => random??? go back and check!
-# df.0 <- round (x,y)
 ```
 Efficacy-Selectivity (all genes)
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
-```{r sidebar1, child="rmd_depmap/all_genes_sidebar.Rmd"}
+```{r all_sidebar, child="rmd_depmap/all_input_sidebar.Rmd"}
 ```
 
 Column {data-width=600}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity (15,847 genes)
 
-```{r summary_q10_r80_all, child="rmd_depmap/efficacy_selectivity_summary_all.Rmd"}
+```{r all_eff_sel, child="rmd_depmap/all_efficacy_selectivity.Rmd"}
 ```
 
 Column {.tabset data-width=400}
 -----------------------------------------------------------------------
 ### Gene list
-```{r gene_sets_all, child="rmd_depmap/gene_sets_all.Rmd"}
+```{r all_gene_list, child="rmd_depmap/all_gene_list.Rmd"}
 ```
 
 ### Lineage
-```{r lineage_all, child="rmd_depmap/lineage_all.Rmd"}
+```{r all_lineage, child="rmd_depmap/all_lineage.Rmd"}
 ```
 
-Functional clusters (essential genes)
+Functional clusters (essential genes only)
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
-```{r sidebar2, child="rmd_depmap/ess_genes_sidebar.Rmd"}
+```{r ess_sidebar, child="rmd_depmap/ess_input_sidebar.Rmd"}
 ```
 
 Column {data-width=500}
 -----------------------------------------------------------------------
 ### Efficacy/Selectivity (2,492 essential genes)
-```{r summary_q10_r80, child="rmd_depmap/efficacy_selectivity_summary.Rmd"}
+```{r ess_eff_sel, child="rmd_depmap/ess_efficacy_selectivity.Rmd"}
 ```
 
 ### Functional similarity (t-SNE of 2,492 essential genes)
-```{r rtsne, child="rmd_depmap/rtsne.Rmd"}
+```{r ess_rtsne, child="rmd_depmap/ess_rtsne.Rmd"}
 ```
 
 Column {.tabset data-width=500}
 -----------------------------------------------------------------------
 ### Gene list
-```{r gene_sets, child="rmd_depmap/gene_sets.Rmd"}
+```{r ess_gene_list, child="rmd_depmap/ess_gene_list.Rmd"}
 ```
 
 ### Lineage
-```{r lineage, child="rmd_depmap/lineage.Rmd"}
+```{r ess_lineage, child="rmd_depmap/ess_lineage.Rmd"}
 ```
 
 ### Intra-cluster correlation
-```{r intra_cluster, child="rmd_depmap/intra_cluster.Rmd"}
+```{r ess_intra_cluster, child="rmd_depmap/ess_intra_cluster.Rmd"}
 ```
 
 
 ### Inter-cluster correlation
-```{r Inter_cluster, child="rmd_depmap/inter_cluster.Rmd"}
+```{r ess_inter_cluster, child="rmd_depmap/ess_inter_cluster.Rmd"}
 ```
 
 About
 ============================================================================
-This Shiny app has been made based on 19q3 release of the [DepMap](http://depmap.org) data, and maintained by [Kenichi Shimada](mailto:kenichi_shimada[at]hms.harvard.edu).
+shinyDepMap has been made based on 19q3 release of the [DepMap](http://depmap.org) project. It is maintained by [Kenichi Shimada](mailto:kenichi_shimada[at]hms.harvard.edu).
