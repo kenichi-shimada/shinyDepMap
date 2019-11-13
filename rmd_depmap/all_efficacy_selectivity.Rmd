@@ -17,7 +17,7 @@ output$all_eff_sel <- renderPlotly({
 		      plot.title=element_text(size=10),
 		      axis.text.x = element_text(angle = 0)) +
 			geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym.query
-			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym.1
+			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym1
 	)
 	ply <- ggplotly(p,tooltip="text")
 	ndata <- length(ply$x$data)
@@ -31,16 +31,16 @@ output$all_eff_sel <- renderPlotly({
 
 observeEvent(input$goButton, {
 	sym.query <- input$sym.query
-	sym.1 <- input$sym.1
+	sym1 <- input$sym1
 	grep.sym.query <- grepl(paste0("^",sym.query),df$sym,ignore.case=T)
 
 	if(any(grep.sym.query)){
 		df.1 <- df[grep.sym.query,] %>%
-			mutate(text = paste0(sym.query,"<br />eff:",efficacy,", sel:",selectivity))
+			mutate(text = paste0(sym.all,"<br />eff:",efficacy,", sel:",selectivity))
 
-		# i.sym.1 <- which(grep.sym.query)[1]
+		# i.sym1 <- which(grep.sym.query)[1]
 
-		df.2 <- df.1[rep(match(sym.1,df.1$sym),2),]
+		df.2 <- df.1[rep(match(sym1,df.1$sym),2),]
 		plotlyProxy('all_eff_sel') %>%
 	        plotlyProxyInvoke("restyle", 
 	        	list(x = list(df.1$efficacy), 
@@ -57,11 +57,11 @@ observeEvent(input$goButton, {
     }
 })
 
-observeEvent(input$sym.1, {
-	sym.1 <- input$sym.1
-	if(sym.1!="" && any(df$sym==sym.1)){
-		i.sym.1 <- which(df$sym==sym.1)
-		df.2 <- df[rep(i.sym.1,2),] %>%
+observeEvent(input$sym1, {
+	sym1 <- input$sym1
+	if(sym1!="" && any(df$sym==sym1)){
+		i.sym1 <- which(df$sym==sym1)
+		df.2 <- df[rep(i.sym1,2),] %>%
 			mutate(text = paste0(sym.all,"<br />eff:",efficacy,", sel:",selectivity))
 
 		plotlyProxy('all_eff_sel') %>%
