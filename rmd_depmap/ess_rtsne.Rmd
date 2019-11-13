@@ -67,40 +67,44 @@ observeEvent(toListen(),{
 	eid2 <- input$eid2
 	cs2 <- input$cs2
 
-	cs.idx2 <- paste0("mem",match(cs2,cs))
-	cl2 <- (df.0 %>% filter(eid==eid2))[[cs.idx2]]
-	if(cl2 == "NA"){
-		eids <- eid2
+	if(eid2==""){
+		return(NULL)
 	}else{
-		eids <- df.0[df.0[[cs.idx2]] %in% cl2,"eid"]
+		cs.idx2 <- paste0("mem",match(cs2,cs))
+		cl2 <- (df.0 %>% filter(eid==eid2))[[cs.idx2]]
+		if(cl2 == "NA"){
+			eids <- eid2
+		}else{
+			eids <- df.0[df.0[[cs.idx2]] %in% cl2,"eid"]
+		}
+
+		grep.eids <- which(df.0$eid %in% eids)
+
+		# warning(paste(gen.path2,eid2=="",lik2,collapse=" "))
+
+		if(any(grep.eids)){
+			df.1 <- df.0[grep.eids,] %>%
+				mutate(text=paste0(sym,
+			        "<br />eff:",efficacy,", sel:",selectivity,
+			        "<br />clust:",mem1,",",mem2,",",mem3))
+
+			df.2 <- df.1[rep(match(eid2,eids),2),]
+
+			plotlyProxy('tsne') %>%
+		        plotlyProxyInvoke("restyle", 
+		        	list(x = list(df.1$x), 
+		        		y = list(df.1$y),
+		        		text = list(df.1$text),
+		        		marker=list(color='rgba(255,128,0,1)',size=6)),
+		        	list(1)) %>%
+		        plotlyProxyInvoke("restyle", 
+		        	list(x = list(df.2$x), 
+		        		y = list(df.2$y),
+		        		text = list(df.2$text),
+		        		marker=list(color='rgba(255,25,0,1)',size=6)),
+		        	list(2))
+	    }
 	}
-
-	grep.eids <- which(df.0$eid %in% eids)
-
-	# warning(paste(gen.path2,eid2=="",lik2,collapse=" "))
-
-	if(any(grep.eids)){
-		df.1 <- df.0[grep.eids,] %>%
-			mutate(text=paste0(sym,
-		        "<br />eff:",efficacy,", sel:",selectivity,
-		        "<br />clust:",mem1,",",mem2,",",mem3))
-
-		df.2 <- df.1[rep(match(eid2,eids),2),]
-
-		plotlyProxy('tsne') %>%
-	        plotlyProxyInvoke("restyle", 
-	        	list(x = list(df.1$x), 
-	        		y = list(df.1$y),
-	        		text = list(df.1$text),
-	        		marker=list(color='rgba(255,128,0,1)',size=6)),
-	        	list(1)) %>%
-	        plotlyProxyInvoke("restyle", 
-	        	list(x = list(df.2$x), 
-	        		y = list(df.2$y),
-	        		text = list(df.2$text),
-	        		marker=list(color='rgba(255,25,0,1)',size=6)),
-	        	list(2))
-    }
 },ignoreInit=TRUE)
 ```
 ```{r}

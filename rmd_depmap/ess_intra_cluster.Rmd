@@ -6,8 +6,8 @@ output$intra_cluster <- renderVisNetwork({
 		eid2 <- "2879" # gpx4
 		eid2 <- "598" # bcl2l1
 		eid2 <- "64978" # mrpl38
-		cs2 <- "small"
-		cs2 <- "large"
+		cs2 <- "Small"
+		cs2 <- "Large"
 		# coef2 <- s3readRDS(paste0("coef_ess_19q3/2879.rds"),bucket="depmap")
 	}else{
 		eid2 <- ieid2()
@@ -17,7 +17,7 @@ output$intra_cluster <- renderVisNetwork({
 	if(eid2==""){
 	    validate(
 	      	need(eid2!="",
-	      		"Please choose an essential gene and a cluster size (default:small).\nSpearman correlation coefficients between genes (> 0.1) within the cluster will be shown here.")
+	      		"Please choose an essential gene and a cluster size (default:Small).\nSpearman correlation coefficients between genes (> 0.1) within the cluster will be shown here.")
 		)
 	}else{
 		cs.idx2 <- paste0("mem",match(cs2,cs))

@@ -57,13 +57,13 @@ shinyInput <- function(FUN, query, id, ...) {
 ##
 observeEvent(input$c1_button,{
   eid2 <- input$eid2
-  this.cl <- sub("button_","",input$c1_button)
+  cl2 <- sub("button_","",input$c1_button)
 
   updateSliderTextInput(session,
     inputId = "cs2",
-    selected = "small"
+    selected = "Small"
   )
-  eids <- df.0$eid[df.0$mem1==this.cl]
+  eids <- df.0$eid[df.0$mem1==cl2]
   # stop(paste(eids,collapse=";"))
 
   if(!any(eid2 %in% eids)){
@@ -81,13 +81,13 @@ observeEvent(input$c1_button,{
 ##
 observeEvent(input$c2_button,{
   eid2 <- input$eid2
-  this.cl <- sub("button_","",input$c2_button)
+  cl2 <- sub("button_","",input$c2_button)
 
   updateSliderTextInput(session,
     inputId = "cs2",
-    selected = "mid"
+    selected = "Medium"
   )
-  eids <- df.0$eid[df.0$mem2==this.cl]
+  eids <- df.0$eid[df.0$mem2==cl2]
   # stop(paste(eids,collapse=";"))
 
   if(!any(eid2 %in% eids)){
@@ -105,13 +105,13 @@ observeEvent(input$c2_button,{
 ##
 observeEvent(input$c3_button,{
   eid2 <- input$eid2
-  this.cl <- sub("button_","",input$c3_button)
+  cl2 <- sub("button_","",input$c3_button)
 
   updateSliderTextInput(session,
     inputId = "cs2",
-    selected = "large"
+    selected = "Large"
   )
-  eids <- df.0$eid[df.0$mem3==this.cl]
+  eids <- df.0$eid[df.0$mem3==cl2]
   # stop(paste(eids,collapse=";"))
 
   if(!any(eid2 %in% eids)){

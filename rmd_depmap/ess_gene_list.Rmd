@@ -7,7 +7,7 @@ output$gene_sets <- renderDT({
 
 	if(eid2==""){
 	    validate(
-	      	need(eid2!="","Please choose an essential gene and a cluster size (default:small).\nGenes in the cluster will be shown here.")
+	      	need(eid2!="","Please choose an essential gene and a cluster size (default:Small).\nGenes in the cluster will be shown here.")
 		)
 	}else{
 		this.mem <- paste0("mem",match(cs2,cs))
