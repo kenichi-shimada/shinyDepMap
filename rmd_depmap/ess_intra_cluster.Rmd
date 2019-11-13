@@ -26,7 +26,10 @@ output$intra_cluster <- renderVisNetwork({
 			return(NULL)
 		}
 
-		s3load(paste0("graph_19q3/",cl2,".rda"),bucket="depmap") # nodes,edges
+		# s3load(paste0("graph_19q3/",cl2,".rda"),bucket="depmap") # nodes,edges
+		graph <- graphs[[cs.idx2]][[cl2]]
+		nodes <- graph$nodes
+		edges <- graph$edges
 
 		p <- visNetwork(nodes, edges,width = "80%") %>%
 		  visIgraphLayout() %>%

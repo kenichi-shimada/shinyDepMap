@@ -38,7 +38,8 @@ icoef2 <- reactive({
   if(is.null(input$eid2)||input$eid2==""){
     return(NULL)
   }else{
-    s3readRDS(paste0("coef_ess_19q3/",input$eid2,".rds"),bucket="depmap")
+    # s3readRDS(paste0("coef_ess_19q3/",input$eid2,".rds"),bucket="depmap")
+    coef[input$eid2,]
   }
 })
 
@@ -46,7 +47,8 @@ ief2 <- reactive({
   if(is.null(input$eid2)||input$eid2==""){
     return(NULL)
   }else{
-    s3readRDS(paste0("scores_all_19q3/",input$eid2,".rds"),bucket="depmap")
+    # s3readRDS(paste0("scores_all_19q3/",input$eid2,".rds"),bucket="depmap")
+    p.scores[input$eid2,]
   }
 })
 

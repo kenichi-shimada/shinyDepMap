@@ -50,7 +50,8 @@ ief1 <- reactive({
   sym1 <- input$sym1
   eids <- df$eid[df$sym==toupper(sym1)]
   if(length(eids)==1){
-    s3readRDS(paste0("scores_all_19q3/",eids,".rds"),bucket="depmap")
+    # s3readRDS(paste0("scores_all_19q3/",eids,".rds"),bucket="depmap")
+    p.scores[eids,]
   }else{
     NULL
   }
