@@ -18,9 +18,8 @@ library(rmarkdown)
 run("depmap.Rmd")
 ```
 
-```r
 sessionInfo()
-```
+
 
 	R version 3.6.1 (2019-07-05)
 	Platform: x86_64-apple-darwin15.6.0 (64-bit)
