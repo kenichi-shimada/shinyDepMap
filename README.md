@@ -18,7 +18,7 @@ library(rmarkdown)
 run("depmap.Rmd")
 ```
 
-sessionInfo()
+sessionInfo:
 
 
 	R version 3.6.1 (2019-07-05)
