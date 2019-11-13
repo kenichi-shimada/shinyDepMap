@@ -18,15 +18,14 @@ library(shinyWidgets)
 library(plotly)
 library(DT)
 library(visNetwork)
-library(aws.s3)
+# library(aws.s3)
 library(tibble)
 library(dplyr)
 library(tidyr)
 ```
 
 ```{r global, context="data"}
-# setwd("/Users/ks389/Dropbox (HMS)/projects/hop_depmap/shiny_DepMap/run_19q3/")
-x <- load("data/depmap_initial_19q3.rda")
+x <- load("data/depmap_initial_19q3_local_run.rda")
 ```
 Efficacy-Selectivity (all genes)
 ============================================================================
