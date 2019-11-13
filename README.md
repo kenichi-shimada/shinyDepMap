@@ -1,5 +1,5 @@
-# depmap-website
-Shiny-based web tool for interactive analysis of DepMap data 
+# shinyDepMap
+A shiny-based web tool for interactive analysis of [DepMap](https://depmap.org/) data (based on their 19q3 release)
 
 To launch the website locally, following pacakges should be installed in the environment as needed (note aws.s3 is for my personal use)
 
