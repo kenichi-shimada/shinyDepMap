@@ -1,5 +1,5 @@
 # shinyDepMap
-A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data (based on their 19q3 release). The website is available [here](https://labsyspharm.shinyapps.io/depmap/), but one can download the code and run it locally.
+A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data (based on their 19q3 release). The website should run  [here](https://labsyspharm.shinyapps.io/depmap/), but one can download the code & data from this repository and run the tool locally.
 
 ## Preparation
 To launch this tool locally, following R pacakges should be installed first.
