@@ -1,25 +1,30 @@
 # shinyDepMap
-A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data (based on their 19q3 release).
+A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data (based on their 19q3 release). The website is available [here](https://labsyspharm.shinyapps.io/depmap/), but one can download the code and run it locally.
 
-To launch this tool locally, following pacakges should be installed in the environment as needed (note aws.s3 is for my personal use)
+## Preparation
+To launch this tool locally, following R pacakges should be installed first.
 
 ```r
+install.packages("devtools")
+install.packages("BiocManager")
+
 devtools::install_github('rstudio/flexdashboard')
 devtools::install_github('hadley/ggplot2')
 
-install.packages("BiocManager")
-library(BiocManager)
-install(c("shiny", "grid","RColorBrewer","shinyWidgets","plotly","DT","visNetwork","aws.s3","tibble","dplyr","tidyr"))
+BiocManager::install(c("shiny", "grid","RColorBrewer","shinyWidgets","plotly","DT","visNetwork","aws.s3","tibble","dplyr","tidyr"))
 ```
 
-Run following command in the directory that contains [depmap.Rmd](depmap.Rmd)
+## Run the app
+Run the following commands in the directory that contains [depmap.Rmd](depmap.Rmd)
 ```r
 library(rmarkdown)
 run("depmap.Rmd")
 ```
 
-sessionInfo:
+## Bug reports
+Please contact [me](kenichi_shimada@hms.harvard.edu) in case you find a bug.
 
+#### Session info
 
 	R version 3.6.1 (2019-07-05)
 	Platform: x86_64-apple-darwin15.6.0 (64-bit)
