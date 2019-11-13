@@ -1,7 +1,7 @@
 ```{r child_sidebar1}
 ## choose genes
 textInput(
-	inputId = "sym1",
+	inputId = "sym.all",
 	label = h4("Gene:"),
   value = "",
   placeholder="A full or partial gene name")
@@ -14,41 +14,41 @@ uiOutput("gene_subset")
 
 ```{r child_reactive1, context="server"}
 igo <- reactive(input$goButton)
-isym1 <- reactive(input$sym1)
+isym.all <- reactive(input$sym.all)
 
 output$gene_subset <- renderUI({ ## in response to symbol, get the probe
   go <- igo()
-  sym1 <- toupper(isolate(isym1()))
+  sym.all <- toupper(isolate(isym.all()))
   this.df <- df %>% 
-    filter(grepl(paste0("^",sym1),df$sym,ignore.case=T)) %>%
+    filter(grepl(paste0("^",sym.all),df$sym,ignore.case=T)) %>%
     arrange(efficacy)
 
-  if(any(this.df$sym==sym1)){
-    idx <- which(this.df$sym==sym1)
+  if(any(this.df$sym==sym.all)){
+    idx <- which(this.df$sym==sym.all)
     ri <- c(idx,seq(nrow(this.df))[-idx])
     this.df <- this.df[ri,]
     # stop(paste(c(idx,ri,collapse=",")))
   }
 
-  # stop(paste(c(sym1,this.df$sym),collapse=","))
+  # stop(paste(c(sym.all,this.df$sym),collapse=","))
   this.set <- this.df$sym
   
-  if(sym1==""){
+  if(sym.all==""){
     return(NULL)
   }else{
     pickerInput(
-      inputId = "sym10",
+      inputId = "sym.all.1",
       label = h5("Choose one gene:"),
       choices = this.set,
       options = list(`live-search` = TRUE))
   }
 })
 
-isym10 <- reactive(input$sym10)
+isym.all.1 <- reactive(input$sym.all.1)
 
 ief1 <- reactive({
-  syms <- input$sym10
-  eids <- df$eid[df$sym==toupper(syms)]
+  sym.all.1 <- input$sym.all.1
+  eids <- df$eid[df$sym==toupper(sym.all.1)]
   if(length(eids)==1){
     s3readRDS(paste0("scores_all_19q3/",eids,".rds"),bucket="depmap")
   }else{

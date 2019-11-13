@@ -1,5 +1,5 @@
-```{r child_summary_efficacy_selectivity1, context="server"}
-output$summary_efficacy_selectivity1 <- renderPlotly({
+```{r child_all_eff_sel, context="server"}
+output$all_eff_sel <- renderPlotly({
 	nlayer <- 31
 	dthres <- 0.10
 	suppressWarnings(
@@ -16,8 +16,8 @@ output$summary_efficacy_selectivity1 <- renderPlotly({
 		      axis.text=element_text(size=10),axis.title=element_text(size=10),
 		      plot.title=element_text(size=10),
 		      axis.text.x = element_text(angle = 0)) +
-			geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym1
-			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym10
+			geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym.all
+			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym.all.1
 	)
 	ply <- ggplotly(p,tooltip="text")
 	ndata <- length(ply$x$data)
@@ -30,18 +30,18 @@ output$summary_efficacy_selectivity1 <- renderPlotly({
 })
 
 observeEvent(input$goButton, {
-	syms1 <- input$sym1
-	syms10 <- input$sym10
-	grep.syms1 <- grepl(paste0("^",syms1),df$sym,ignore.case=T)
+	sym.all <- input$sym.all
+	sym.all.1 <- input$sym.all.1
+	grep.sym.all <- grepl(paste0("^",sym.all),df$sym,ignore.case=T)
 
-	if(any(grep.syms1)){
-		df.1 <- df[grep.syms1,] %>%
+	if(any(grep.sym.all)){
+		df.1 <- df[grep.sym.all,] %>%
 			mutate(text = paste0(sym.all,"<br />eff:",efficacy,", sel:",selectivity))
 
-		# i.syms10 <- which(grep.syms1)[1]
+		# i.sym.all.1 <- which(grep.sym.all)[1]
 
-		df.2 <- df.1[rep(match(syms10,df.1$sym),2),]
-		plotlyProxy('summary_efficacy_selectivity1') %>%
+		df.2 <- df.1[rep(match(sym.all.1,df.1$sym),2),]
+		plotlyProxy('all_eff_sel') %>%
 	        plotlyProxyInvoke("restyle", 
 	        	list(x = list(df.1$efficacy), 
 	        		y = list(df.1$selectivity),
@@ -57,14 +57,14 @@ observeEvent(input$goButton, {
     }
 })
 
-observeEvent(input$sym10, {
-	syms10 <- input$sym10
-	if(syms10!="" && any(df$sym==syms10)){
-		i.syms10 <- which(df$sym==syms10)
-		df.2 <- df[rep(i.syms10,2),] %>%
+observeEvent(input$sym.all.1, {
+	sym.all.1 <- input$sym.all.1
+	if(sym.all.1!="" && any(df$sym==sym.all.1)){
+		i.sym.all.1 <- which(df$sym==sym.all.1)
+		df.2 <- df[rep(i.sym.all.1,2),] %>%
 			mutate(text = paste0(sym.all,"<br />eff:",efficacy,", sel:",selectivity))
 
-		plotlyProxy('summary_efficacy_selectivity1') %>%
+		plotlyProxy('all_eff_sel') %>%
 	        plotlyProxyInvoke("restyle", 
 	        	list(x = list(df.2$efficacy), 
 	        		y = list(df.2$selectivity),
@@ -76,5 +76,5 @@ observeEvent(input$sym10, {
 
 ```
 ```{r}
-plotlyOutput('summary_efficacy_selectivity1')
+plotlyOutput('all_eff_sel')
 ```

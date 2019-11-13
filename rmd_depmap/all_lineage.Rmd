@@ -1,23 +1,23 @@
 
-```{r child_lineage1, context="server"}
-output$lineage1 <- renderPlotly({
+```{r child_all_lineage, context="server"}
+output$all_lineage <- renderPlotly({
 	options(warn=0)
 
-	sym1 <- toupper(isolate(isym1()))
-	sym10 <- isolate(isym10())
+	sym.all <- toupper(isolate(isym.all()))
+	sym.all.1 <- isolate(isym.all.1())
 	this.ef <- ief1()
 
-	if(sym1 == "" || is.null(sym10) || !grepl(sym1,sym10,ignore.case=T)){
+	if(sym.all == "" || is.null(sym.all.1) || !grepl(sym.all,sym.all.1,ignore.case=T)){
 	    validate(
-		if(sym1==""){
-	      	need(sym1!="", 
+		if(sym.all==""){
+	      	need(sym.all!="", 
 	      		"Please type in a full or partial gene name.\nPlease choose one gene from the drop-down list.\nPerturbation scores across 423 cell lines for the gene will be shown here.")
 	    }else{
-	      	if(is.null(sym10)){
-			    need(!is.null(sym10),paste0("No gene symbol has a prefix '",sym1,"'"))
+	      	if(is.null(sym.all.1)){
+			    need(!is.null(sym.all.1),paste0("No gene symbol has a prefix '",sym.all,"'"))
 			}else if(is.null(this.ef)){
 				need(!is.null(this.ef),paste0("Perturbation scores for the gene '",
-					sym10,"' were not found"))
+					sym.all.1,"' were not found"))
 			}
 		})
 	}else{
@@ -48,7 +48,7 @@ output$lineage1 <- renderPlotly({
 			  axis.text=element_text(size=8),axis.title=element_text(size=10),
 			  plot.title=element_text(size=15, hjust=0.5),
 			  axis.text.x = element_text(angle = 0)) +
-			ggtitle(sym10) + 
+			ggtitle(sym.all.1) + 
 			labs(x="",y="Combined efficacy score")
 
 		ply <- ggplotly(pvio) %>% config(displayModeBar=F)
@@ -62,7 +62,7 @@ output$lineage1 <- renderPlotly({
 ```
 ```{r}
 # textOutput("error1")
-plotlyOutput("lineage1")
+plotlyOutput("all_lineage")
 
 ```
 

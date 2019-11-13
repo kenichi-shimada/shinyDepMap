@@ -1,33 +1,29 @@
-```{r child_gene_sets1, context="server"}
-output$gene_sets1 <- renderDataTable({
+```{r child_all_gene_list, context="server"}
+output$all_gene_list <- renderDataTable({
 	options(warn=0)
 
 	go <- igo()
-	sym1 <- toupper(isolate(isym1()))
-	sym10 <- isym10()
+	sym.all <- toupper(isolate(isym.all()))
+	sym.all.1 <- isym.all.1()
 
-	# warning(sym1)
-	# warning(is.null(sym10))
-	# warning(!grepl(sym1,sym10))
-
-	if(sym1 == "" || is.null(sym10) || !grepl(sym1,sym10,ignore.case=T)){
+	if(sym.all == "" || is.null(sym.all.1) || !grepl(sym.all,sym.all.1,ignore.case=T)){
 	    validate(
-	      if(sym1==""){
-	      	need(sym1!="", "Please type in a full or partial gene name.\nGenes that match your query will be shown here.")
+	      if(sym.all==""){
+	      	need(sym.all!="", "Please type in a full or partial gene name.\nGenes that match your query will be shown here.")
 	      }else{
-		    need(!is.null(sym10),paste0("No gene symbol has a prefix '",sym1,"'"))
+		    need(!is.null(sym.all.1),paste0("No gene symbol has a prefix '",sym.all,"'"))
  		  }
 		)
 	}else{
-		eids <- df$eid[grep(paste0("^",sym1),df$sym,ignore.case=T)]
-		# stop(paste(sym10,collapse=","))
+		eids <- df$eid[grep(paste0("^",sym.all),df$sym,ignore.case=T)]
+		# stop(paste(sym.all.1,collapse=","))
 
 		dt <- df %>% 
 			filter(eid %in% eids) %>%
 			arrange(efficacy,desc(selectivity))
 
 		dt <- dt %>% select(sym, efficacy, selectivity) %>%
-			mutate(selected = as.numeric(sym == sym10)) %>%
+			mutate(selected = as.numeric(sym == sym.all.1)) %>%
 			mutate(sym = paste0('<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=',sym,'" target="_blank">',sym,'</a>')) %>%
 			`colnames<-`(c("Gene","Efficacy","Selectivity","selected")) %>%
 			datatable(extensions = 'Scroller', 
@@ -51,5 +47,5 @@ output$gene_sets1 <- renderDataTable({
 })
 ```
 ```{r}
-dataTableOutput("gene_sets1")
+dataTableOutput("all_gene_list")
 ```
