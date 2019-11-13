@@ -24,9 +24,9 @@ output$summary_efficacy_selectivity <- renderPlotly({
 	p <- ggplot(df.0,aes(text=text)) +
 		geom_vline(xintercept=thres.eff, col="grey70") +
 		geom_hline(yintercept=c(0,1),col=c("grey50","grey70")) + 
-		geom_point(data = (df.0 %>% filter(dens > 0.07) %>% mutate(text="")),
+		geom_point(data = df.0, #%>% filter(dens > 0.07) %>% mutate(text="")),
 			aes(efficacy, selectivity, col=pri), size = .5) +
-		geom_point(data = (df.0 %>% filter(dens <= 0.07)),
+		geom_point(data = df.0, #%>% filter(dens <= 0.07)),
 			aes(efficacy, selectivity, col=pri), size = .5) + col +
 		# geom_point(aes(efficacy, selectivity, col=pri), size = .5) + col +
 		theme_bw() +
