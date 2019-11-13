@@ -35,13 +35,13 @@ output$tsne <- renderPlotly({
 		    geom_point(data=dummy[1,], aes(x,y), col=NA,size=1) +
 		    geom_point(data=dummy[2,],aes(x,y), col=NA,size=1)
 	}else{
-		this.mem <- paste0("mem",match(cs2,cs))
-		this.cl <- (df.0 %>% filter(eid==eid2))[[this.mem]]
-		if(this.cl == "NA"){
+		cs.idx2 <- paste0("mem",match(cs2,cs))
+		cl2 <- (df.0 %>% filter(eid==eid2))[[cs.idx2]]
+		if(cl2 == "NA"){
 
 			eids <- eid2
 		}else{
-			eids <- df.0[df.0[[this.mem]] %in% this.cl,"eid"]
+			eids <- df.0[df.0[[cs.idx2]] %in% cl2,"eid"]
 		}
 
 
@@ -67,12 +67,12 @@ observeEvent(toListen(),{
 	eid2 <- input$eid2
 	cs2 <- input$cs2
 
-	this.mem <- paste0("mem",match(cs2,cs))
-	this.cl <- (df.0 %>% filter(eid==eid2))[[this.mem]]
-	if(this.cl == "NA"){
+	cs.idx2 <- paste0("mem",match(cs2,cs))
+	cl2 <- (df.0 %>% filter(eid==eid2))[[cs.idx2]]
+	if(cl2 == "NA"){
 		eids <- eid2
 	}else{
-		eids <- df.0[df.0[[this.mem]] %in% this.cl,"eid"]
+		eids <- df.0[df.0[[cs.idx2]] %in% cl2,"eid"]
 	}
 
 	grep.eids <- which(df.0$eid %in% eids)

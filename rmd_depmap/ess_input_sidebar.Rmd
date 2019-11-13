@@ -1,10 +1,5 @@
 ```{r child_sidebar2}
 
-## choose genes
-# radioButtons("ess_gen_clust",h4("Choose from:"),
-#   choices=c("essential gene","pathway"),  
-#   # choices=c("essential gene","cluster","pathway","tissue specific gs"),  
-#   selected="essential gene")
 
 pickerInput(
 	inputId = "eid2",
@@ -12,9 +7,6 @@ pickerInput(
 	choices = c("",eids.ess),
   selected = "",
 	options = list(`live-search` = TRUE))
-
-## highlight cluster by some colors
-# uiOutput("gene_subset2")
 
 ## 0. sidebar (highlight)
 HTML("<hr>")

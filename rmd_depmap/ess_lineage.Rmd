@@ -2,22 +2,22 @@
 output$lineage <- renderPlotly({
 	options(warn=0)
 
-	this.eid <- ieid2()
-	this.ef <- ief2()
+	eid2 <- ieid2()
+	ef2 <- ief2()
 
-	# warning(this.eid)
-	# warning(this.ef)
+	# warning(eid2)
+	# warning(ef2)
 
-	if(this.eid==""){
+	if(eid2==""){
 	    validate(
-	      	need(this.eid!="",
+	      	need(eid2!="",
 	      		"Please choose an essential gene.\nPerturbation scores across 423 cell lines for the gene will be shown here.")
 		)
 	}else{
 
-		this.sym <- df.0$sym.all[df.0$eid==this.eid]
+		sym.all2 <- df.0$sym.all[df.0$eid==eid2]
 
-		ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
+		ef.1 <- data.frame(ef=ef2,DepMap_ID=names(ef2),stringsAsFactors=FALSE) %>%
 			left_join(cl.info,by="DepMap_ID") %>%
 			mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_Name))
 
@@ -44,7 +44,7 @@ output$lineage <- renderPlotly({
 			  axis.text=element_text(size=8),axis.title=element_text(size=10),
 			  plot.title=element_text(size=15, hjust=0.5),
 			  axis.text.x = element_text(angle = 0)) +
-			ggtitle(this.sym) + 
+			ggtitle(sym.all2) + 
 			labs(x="",y="Combined efficacy score")
 
 		ply <- ggplotly(pvio) %>% config(displayModeBar=F)
