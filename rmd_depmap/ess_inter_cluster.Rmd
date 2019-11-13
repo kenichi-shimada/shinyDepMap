@@ -18,7 +18,7 @@ output$inter_cluster <- renderPlotly({
 	if(eid2==""){
 	    validate(
 	      	need(eid2!="",
-	      		"Please choose an essential gene and a cluster size (default:small).\nSpearman correlation coefficients across the essential genes will be shown here.")
+	      		"Please choose an essential gene and a cluster size (default:Small).\nSpearman correlation coefficients across the essential genes will be shown here.")
 		)
 	}else{
 		sym.all2 <- df.0$sym.all[df.0$eid == eid2]
