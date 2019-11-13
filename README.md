@@ -1,7 +1,7 @@
 # depmap-website
 Shiny-based web tool for interactive analysis of DepMap data 
 
-To launch the website locally, following pacakges should be installed in the environment as needed (note aws.s3 is for my personal use only)
+To launch the website locally, following pacakges should be installed in the environment as needed (note aws.s3 is for my personal use)
 
 ```r
 devtools::install_github('rstudio/flexdashboard')
