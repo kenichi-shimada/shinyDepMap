@@ -1,46 +1,62 @@
 
 ```{r child_lineage1, context="server"}
 output$lineage1 <- renderPlotly({
-	syms10 <- isym10()
+	options(warn=0)
+
+	sym1 <- toupper(isolate(isym1()))
+	sym10 <- isolate(isym10())
 	this.ef <- ief1()
 
-	if(is.null(this.ef))return(NULL);
+	if(sym1 == "" || is.null(sym10) || !grepl(sym1,sym10,ignore.case=T)){
+	    validate(
+		if(sym1==""){
+	      	need(sym1!="", 
+	      		"Please type in a full or partial gene name.\nPlease choose one gene from the drop-down list.\nPerturbation scores across 423 cell lines for the gene will be shown here.")
+	    }else{
+	      	if(is.null(sym10)){
+			    need(!is.null(sym10),paste0("No gene symbol has a prefix '",sym1,"'"))
+			}else if(is.null(this.ef)){
+				need(!is.null(this.ef),paste0("Perturbation scores for the gene '",
+					sym10,"' were not found"))
+			}
+		})
+	}else{
+		ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
+			left_join(cl.info,by="DepMap_ID") %>%
+			mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_Name))
 
-	ef.1 <- data.frame(ef=this.ef,DepMap_ID=names(this.ef),stringsAsFactors=FALSE) %>%
-		left_join(cl.info,by="DepMap_ID") %>%
-		mutate(cell.name=sub("^([^_]+)_.+","\\1",CCLE_name))
+		med.ef <- tapply(ef.1$ef,ef.1$lineage,mean)
+		o <- order(med.ef,decreasing=F)
+		cell.levs <- names(med.ef)[o]
 
-	med.ef <- tapply(ef.1$ef,ef.1$disease,median)
-	o <- order(med.ef,decreasing=F)
-	cell.levs <- names(med.ef)[o]
+		ef.1 <- ef.1 %>% 
+			mutate(lineage=factor(lineage,levels=cell.levs)) %>%
+			mutate(text=paste0(
+				"Cell: ",cell.name,"<br />",
+				"Type: ",lineage,"<br />",
+				"Subtype: ",lineage_subtype,"<br />",
+				"Sub-subtype: ",lineage_sub_subtype,"<br />",
+				"Efficacy: ",round(ef,3),"<br />"))
 
-	ef.1 <- ef.1 %>% 
-		mutate(disease=factor(disease,levels=cell.levs)) %>%
-		mutate(text=paste0(
-			"Cell: ",cell.name,"<br />",
-			"Type: ",disease,"<br />",
-			"Subtype: ",disease_sutype,"<br />",
-			"Sub-subtype: ",disease_sub_subtype,"<br />",
-			"Efficacy: ",round(ef,3),"<br />"))
+		pvio <- ef.1 %>%
+			ggplot(aes(x=lineage,y=ef)) +
+			geom_violin(scale="area",aes(fill=lineage,color=lineage)) +
+			geom_jitter(height = 0, width = 0.2, size=.5) +
+			coord_flip() +
+			theme_bw() +
+			theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+			  axis.text=element_text(size=8),axis.title=element_text(size=10),
+			  plot.title=element_text(size=15, hjust=0.5),
+			  axis.text.x = element_text(angle = 0)) +
+			ggtitle(sym10) + 
+			labs(x="",y="Combined efficacy score")
 
-	pvio <- ef.1 %>%
-		ggplot(aes(x=disease,y=ef)) +
-		geom_violin(scale="area",aes(fill=disease,color=disease)) +
-		geom_jitter(height = 0, width = 0.2, size=.5) +
-		coord_flip() +
-		theme_bw() +
-		theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
-		  axis.text=element_text(size=8),axis.title=element_text(size=10),
-		  plot.title=element_text(size=15, hjust=0.5),
-		  axis.text.x = element_text(angle = 0)) +
-		ggtitle(syms10) + 
-		labs(x="",y="Combined efficacy score")
-
-	ply <- ggplotly(pvio) %>% config(displayModeBar=F)
-	ndata <- length(ply$x$data)
-	for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
-    ply$x$data[[ndata]]$text <- ef.1$text
-	ply
+		ply <- ggplotly(pvio) %>% config(displayModeBar=F)
+		ndata <- length(ply$x$data)
+		for(i in seq(ndata-1))ply$x$data[[i]]$hoverinfo <- "none"
+	    ply$x$data[[ndata]]$text <- ef.1$text
+		ply
+	}
 })
 
 ```

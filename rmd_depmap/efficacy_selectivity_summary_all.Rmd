@@ -2,23 +2,23 @@
 output$summary_efficacy_selectivity1 <- renderPlotly({
 	nlayer <- 31
 	dthres <- 0.10
-	p <- ggplot(df,aes(efficacy,selectivity)) +
-		geom_vline(xintercept=c(0,thres.eff), col=c("grey50","grey70")) +
-		geom_hline(yintercept=c(0,1),col=c("grey50","grey70")) + 
-		stat_density_2d(aes(fill = stat(level)),geom="polygon",bins=nlayer) +
-		scale_fill_gradientn(colors=rev(blues9)) + 
-		geom_point(data=(df %>% filter(dens <= dthres)),
-			aes(efficacy, selectivity,text=text), 
-			color=blues9[9], size = 1) +
-		theme_bw() +
-		# xlim(xl[1],xl[2]) +
-		# ylim(yl[1],yl[2]) +
-	    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
-	      axis.text=element_text(size=10),axis.title=element_text(size=10),
-	      plot.title=element_text(size=10),
-	      axis.text.x = element_text(angle = 0)) +
-		geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym1
-		geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym10
+	suppressWarnings(
+		p <- ggplot(df,aes(efficacy,selectivity)) +
+			geom_vline(xintercept=c(0,thres.eff), col=c("grey50","grey70")) +
+			geom_hline(yintercept=c(0,1),col=c("grey50","grey70")) + 
+			stat_density_2d(aes(fill = stat(level)),geom="polygon",bins=nlayer) +
+			scale_fill_gradientn(colors=rev(blues9)) + 
+			geom_point(data=(df %>% filter(dens <= dthres)),
+				aes(efficacy, selectivity,text=text), 
+				color=blues9[9], size = 1) +
+			theme_bw() +
+		    theme(legend.position="none",plot.margin=unit(c(0,0,0,0),"lines"),
+		      axis.text=element_text(size=10),axis.title=element_text(size=10),
+		      plot.title=element_text(size=10),
+		      axis.text.x = element_text(angle = 0)) +
+			geom_point(data=dummy[1,],aes(efficacy,selectivity),col=NA,size=1) + # sym1
+			geom_point(data=dummy[2,],aes(efficacy,selectivity),col=NA,size=1) # sym10
+	)
 	ply <- ggplotly(p,tooltip="text")
 	ndata <- length(ply$x$data)
 	sapply(ply$x$data,function(x)length(x$text))	
@@ -38,7 +38,7 @@ observeEvent(input$goButton, {
 		df.1 <- df[grep.syms1,] %>%
 			mutate(text = paste0(sym.all,"<br />eff:",efficacy,", sel:",selectivity))
 
-		i.syms10 <- which(grep.syms1)[1]
+		# i.syms10 <- which(grep.syms1)[1]
 
 		df.2 <- df.1[rep(match(syms10,df.1$sym),2),]
 		plotlyProxy('summary_efficacy_selectivity1') %>%

@@ -1,0 +1,56 @@
+```{r child_intra_cluster, context="server"}
+output$intra_cluster <- renderVisNetwork({
+	options(warn=0)
+
+	if(0){
+		this.eid <- "2879" # gpx4
+		this.eid <- "598" # bcl2l1
+		this.eid <- "64978" # mrpl38
+		this.cs <- "small"
+		this.cs <- "large"
+		# this.coef <- s3readRDS(paste0("coef_ess_19q3/2879.rds"),bucket="depmap")
+	}else{
+		this.eid <- ieid2()
+		this.cs <- ics2()
+	}
+
+	if(this.eid==""){
+	    validate(
+	      	need(this.eid!="",
+	      		"Please choose an essential gene and a cluster size (default:small).\nSpearman correlation coefficients between genes (> 0.1) within the cluster will be shown here.")
+		)
+	}else{
+		this.mem <- paste0("mem",match(this.cs,cs))
+		this.cl <- (df.0 %>% filter(eid==this.eid))[[this.mem]]
+		if(is.na(this.cl)){
+			return(NULL)
+		}
+
+		s3load(paste0("graph_19q3/",this.cl,".rda"),bucket="depmap") # nodes,edges
+
+		p <- visNetwork(nodes, edges,width = "80%") %>%
+		  visIgraphLayout() %>%
+		  visNodes(
+		    shape = "dot",
+		    color = list(
+		      background = "#0085AF",
+		      border = "#013848",
+		      highlight = "#FF8000"
+		    ),
+		    shadow = list(enabled = TRUE, size = 10)
+		  ) %>%
+		  visEdges(
+		    shadow = FALSE,
+		    color = list(color = "#7BA3C4", highlight = "#C62F4B")
+		  ) %>%
+		  visOptions(highlightNearest = list(enabled = T, degree = 1, hover = F),
+		  			 nodesIdSelection = list(enabled =TRUE, selected = this.eid),
+		             selectedBy = "group") %>% 
+		  visInteraction(dragView=FALSE,zoomView=FALSE) %>%
+		  visLayout(randomSeed = 11)
+	}
+})
+```
+```{r}
+visNetworkOutput("intra_cluster")
+```

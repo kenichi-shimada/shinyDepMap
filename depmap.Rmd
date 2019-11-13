@@ -17,6 +17,7 @@ library(RColorBrewer)
 library(shinyWidgets)
 library(plotly)
 library(DT)
+library(visNetwork)
 library(aws.s3)
 library(tibble)
 library(dplyr)
@@ -24,10 +25,13 @@ library(tidyr)
 ```
 
 ```{r global, context="data"}
-x <- load("data/depmap_initial_19q2.rda")
+# setwd("/Users/ks389/Dropbox (HMS)/projects/hop_depmap/shiny_DepMap/run_19q3/")
+x <- load("data/depmap_initial_19q3.rda")
+# debug
+# C1 = "54" -> C2 = "0", C3 => random??? go back and check!
+# df.0 <- round (x,y)
 ```
-
-All genes
+Efficacy-Selectivity (all genes)
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
@@ -36,14 +40,14 @@ Sidebar {.sidebar}
 
 Column {data-width=600}
 -----------------------------------------------------------------------
-### Efficacy/Selectivity
+### Efficacy/Selectivity (15,847 genes)
 
 ```{r summary_q10_r80_all, child="rmd_depmap/efficacy_selectivity_summary_all.Rmd"}
 ```
 
 Column {.tabset data-width=400}
 -----------------------------------------------------------------------
-### Gene sets
+### Gene list
 ```{r gene_sets_all, child="rmd_depmap/gene_sets_all.Rmd"}
 ```
 
@@ -51,8 +55,7 @@ Column {.tabset data-width=400}
 ```{r lineage_all, child="rmd_depmap/lineage_all.Rmd"}
 ```
 
-
-Essential genes
+Functional clusters (essential genes)
 ============================================================================
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
@@ -61,17 +64,17 @@ Sidebar {.sidebar}
 
 Column {data-width=500}
 -----------------------------------------------------------------------
-### Efficacy/Selectivity
+### Efficacy/Selectivity (2,492 essential genes)
 ```{r summary_q10_r80, child="rmd_depmap/efficacy_selectivity_summary.Rmd"}
 ```
 
-### tSNE (2,308 essential genes)
+### Functional similarity (t-SNE of 2,492 essential genes)
 ```{r rtsne, child="rmd_depmap/rtsne.Rmd"}
 ```
 
 Column {.tabset data-width=500}
 -----------------------------------------------------------------------
-### Gene sets
+### Gene list
 ```{r gene_sets, child="rmd_depmap/gene_sets.Rmd"}
 ```
 
@@ -79,10 +82,15 @@ Column {.tabset data-width=500}
 ```{r lineage, child="rmd_depmap/lineage.Rmd"}
 ```
 
+### Intra-cluster correlation
+```{r intra_cluster, child="rmd_depmap/intra_cluster.Rmd"}
+```
+
+
 ### Inter-cluster correlation
 ```{r Inter_cluster, child="rmd_depmap/inter_cluster.Rmd"}
 ```
 
 About
 ============================================================================
-This Shiny app has been made based on 19q2 release of [DepMap](http://depmap.org) data, and maintained by [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu).
+This Shiny app has been made based on 19q3 release of the [DepMap](http://depmap.org) data, and maintained by [Kenichi Shimada](mailto:kenichi_shimada[at]hms.harvard.edu).

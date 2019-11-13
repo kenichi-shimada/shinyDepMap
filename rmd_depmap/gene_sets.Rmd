@@ -1,109 +1,83 @@
 ```{r child_gene_sets, context="server"}
 output$gene_sets <- renderDT({
-	gen.path2 <- igenclust2()
-	eid2 <- ieid2() 
-	path2 <- ipath2() 
-	clust2 <- iclust2()
-	lik2 <- ilik2()
-	gs2 <- isolate(igs2())
+	options(warn=0)
 
-	# warning(gen.path2)
-	# warning(class(gen.path2))
-	# warning(length(gen.path2))
+	eid2 <- ieid2()
+	cs2 <- ics2()
 
-	# warning(eid2)
-	# warning(class(eid2))
-	# warning(length(eid2))
-
-	# warning(path2)
-	# warning(class(path2))
-	# warning(length(path2))
-
-	# warning(clust2)
-	# warning(class(clust2))
-	# warning(length(clust2))
-
-	# warning(lik2)
-	# warning(class(lik2))
-	# warning(length(lik2))
-
-	# warning(gs2)
-	# warning(class(gs2))
-	# warning(length(gs2))
-
-
-	# if(eid2=="" || is.null(syms10) || !grepl(syms,syms10,ignore.case=T)){
-	# eids <- define.eids.or.null(gen.path2,eid2,path2,clust2,mems)
-
-	if(is.null(gen.path2)||
-		(gen.path2=="essential gene"&&(is.null(eid2)||eid2==""))||
-		(gen.path2=="pathway"&&(is.null(path2)||path2==""))||
-		(gen.path2=="cluster"&&(is.null(clust2)||clust2==""))) {
-		eids <- NULL
-	}else if(gen.path2=="essential gene"){
-		eids <- eid2
-	}else if(gen.path2=="pathway"){
-		gs2 <- s3readRDS(paste0("msigdb_ess_19q2/",path2,".rds"),bucket="depmap")
-		eids <- gs2
-	}else if(gen.path2=="cluster"){
-		eids <- mems$eid[mems$mem==clust2]
-	}
-
-	# warning("test")
-	if(is.null(eids)||!any(mems$eid %in% eids)){
-		return(NULL)
+	if(eid2==""){
+	    validate(
+	      	need(eid2!="","Please choose an essential gene and a cluster size (default:small).\nGenes in the cluster will be shown here.")
+		)
 	}else{
-		dt <- mems %>% filter(eid %in% eids) %>%
-			select(sym, efficacy, selectivity, mem, lik) %>%
+		this.mem <- paste0("mem",match(cs2,cs))
+		this.cl <- (df.0 %>% filter(eid==eid2))[[this.mem]]
+		if(is.na(this.cl)||this.cl == "NA"){
+			eids <- eid2
+		}else{
+			eids <- df.0[df.0[[this.mem]] %in% this.cl,"eid"]
+		}
+
+		dt <- df.0 %>% filter(eid %in% eids) %>%
+			select(sym,eid,efficacy, selectivity,mem1,mem2,mem3) %>% 
 			arrange(efficacy,desc(selectivity)) %>%
 			mutate(sym = paste0('<a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=',sym,'" target="_blank">',sym,'</a>')) %>%
-			`colnames<-`(c("Gene","Eff","Sel","Clstr","Lik"))
+			`colnames<-`(c("Gene","eid","Eff","Sel","S","M","L"))#,"Clstr","Lik"))
 
-		if(gen.path2=="cluster"){
-			dt <- dt %>%
-				mutate(selected = as.numeric(Lik < lik2)) %>%
-				datatable(extensions = 'Scroller', 
-					options = list(
-					  columnDefs = list(list(targets = 6, visible = FALSE)),
-		　　			  rowReorder = TRUE,
-					  deferRender = TRUE,
-					  scrollY = 1000,
-					  pageLength = 200,
-					  scroller = TRUE,
-					  order = list(list(2, 'asc'), list(3, 'desc'))),
-					selection=list(mode="none"),
-					editable=FALSE, escape=FALSE) %>%
+		# warning(paste(dim(dt),collapse=","))
+		dt <- dt %>%
+			mutate(selected = as.numeric(eid == eid2)) %>%
+			mutate(S=sapply(S,function(i){
+				if(is.na(i)||i=="NA"){
+					return("none")
+				}else{
+		      	shinyInput(actionButton, i, 'button_', 
+			      	label = i,
+			      	onclick = 'Shiny.onInputChange(\"c1_button\",  this.id)' )
+				}
+			})) %>%
+			mutate(M=sapply(M,function(i){
+				if(is.na(i)||i=="NA"){
+					return("none")
+				}else{
+		      	shinyInput(actionButton, i, 'button_', 
+			      	label = i,
+			      	onclick = 'Shiny.onInputChange(\"c2_button\",  this.id)' )
+				}
+			})) %>%
+			mutate(L=sapply(L,function(i){
+				if(is.na(i)||i=="NA"){
+					return("none")
+				}else{
+		      	shinyInput(actionButton, i, 'button_', 
+			      	label = i,
+			      	onclick = 'Shiny.onInputChange(\"c3_button\",  this.id)' )
+				}
+			})) %>%
+			datatable(extensions = 'Scroller', 
+				options = list(
+				  columnDefs = list(
+				  	list(targets = c(2,8), visible = FALSE),
+				  	list(className = 'dt-center', targets = 1:7)
+				  	),
+	　　			  rowReorder = TRUE,
+				  deferRender = TRUE,
+				  scrollY = 1000,
+				  pageLength = 200,
+				  scroller = TRUE,
+				  order = list(list(3, 'asc'), list(4, 'desc'))),
+				selection=list(mode="none"),
+				editable=FALSE, escape=FALSE) %>%
  		    formatStyle(
-			  6,
+			  8,
 			  target = 'row',
-			  backgroundColor = styleEqual(c(1,0), c('gray', NA))
+			  backgroundColor = styleEqual(c(1,0), c('#ffcccb', NA))
 			)
-
-		}else{
-			dt <- dt %>%
-				mutate(Clstr=sapply(Clstr,function(i){
-					if(i==0){
-						return(i)
-					}else{
-			      	shinyInput(actionButton, i, 'button_', 
-				      	label = i,
-				      	onclick = 'Shiny.onInputChange(\"select_button\",  this.id)' )
-					}
-				})) %>%
-				datatable(extensions = 'Scroller', 
-					options = list(
-		　　			  rowReorder = TRUE,
-					  deferRender = TRUE,
-					  scrollY = 1000,
-					  pageLength = 200,
-					  scroller = TRUE,
-					  order = list(list(2, 'asc'), list(3, 'desc'))),
-					selection=list(mode="none"),
-					editable=FALSE, escape=FALSE)
-		}
 		return(dt)
 	}
 })
+
+# dataTableProxy for quicker update
 ```
 ```{r}
 DTOutput("gene_sets")
