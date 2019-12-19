@@ -1,30 +1,48 @@
 # shinyDepMap
-A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data (based on their 19q3 release). The website should run  [here](https://labsyspharm.shinyapps.io/depmap/), but one can download the code & data from this repository and run the tool locally.
+A shiny-based interactive web tool to analyze [DepMap](https://depmap.org/) data
+(based on their 19q3 release). There are several options for using it:
 
-## Preparation
-To launch this tool locally, following R pacakges should be installed first.
+1. [Use the public version of the tool](https://labsyspharm.shinyapps.io/depmap/)
+2. [Run the tool locally in R](#run-with-r)
+3. [Run the tool locally using Docker](#run-with-docker)
+
+## Run with R
+
+### Preparation
+To launch this tool locally in R, clone or download this repository and install
+the required R pacakges as follows:
 
 ```r
 install.packages("devtools")
 install.packages("BiocManager")
+install.packages("ggplot2")
 
-devtools::install_github('rstudio/flexdashboard')
-devtools::install_github('hadley/ggplot2')
+devtools::install_github('rstudio/flexdashboard@ccb5f1ad057f42da24818d6ff3acb0f4e6b944cb')
 
 BiocManager::install(c("shiny", "grid","RColorBrewer","shinyWidgets","plotly","DT","visNetwork","aws.s3","tibble","dplyr","tidyr"))
 ```
 
-## Run the app
+### Launch the app
 Run the following commands in the directory that contains [depmap.Rmd](depmap.Rmd)
 ```r
 library(rmarkdown)
 run("depmap.Rmd")
 ```
 
-## Bug reports
-Please contact [me](kenichi_shimada@hms.harvard.edu) in case you find a bug.
+## Run with Docker
+An alternative to the _Run with R_ option. Run the following commands, then open
+your web browser to http://127.0.0.1:8888/ .
 
-#### Session info
+```
+docker pull labsyspharm/shinydepmap:latest
+docker run -p 8888:8888 labsyspharm/shinydepmap:latest
+```
+
+## Bug reports
+Please contact [Kenichi Shimada](mailto:kenichi_shimada@hms.harvard.edu) in case
+you find a bug.
+
+## Session info
 
 	R version 3.6.1 (2019-07-05)
 	Platform: x86_64-apple-darwin15.6.0 (64-bit)
@@ -61,5 +79,3 @@ Please contact [me](kenichi_shimada@hms.harvard.edu) in case you find a bug.
 	[31] aws.signature_0.5.2 mime_0.7            xtable_1.8-4       
 	[34] colorspace_1.4-1    httpuv_1.5.2        lazyeval_0.2.2    
 	[37] munsell_0.5.0       crayon_1.3.4       
-
-
