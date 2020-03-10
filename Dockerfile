@@ -5,16 +5,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN Rscript \
-  -e "BiocManager::install(c('shiny', 'grid','RColorBrewer','shinyWidgets','plotly','DT','visNetwork','aws.s3','tibble','dplyr','tidyr'))"
-RUN Rscript \
-  -e "devtools::install_github('rstudio/flexdashboard@ccb5f1ad057f42da24818d6ff3acb0f4e6b944cb')"
+  -e "BiocManager::install(c('shiny','markdown','RColorBrewer','shinyWidgets','plotly','DT','igraph','visNetwork','tibble','dplyr','tidyr','yonder'))"
 
-COPY / /app
+COPY / /app/shinyDepMap
 
 WORKDIR /app
 EXPOSE 8888
 CMD [ \
     "/usr/bin/Rscript", \
-    "-e", "library(rmarkdown)", \
-    "-e", "run('depmap.Rmd', shiny_args=list(host='0.0.0.0', port=8888))" \
+    "-e", "library(shiny)", \
+    "-e", "runApp('shinyDepMap', host='0.0.0.0', port=8888)" \
 ]
