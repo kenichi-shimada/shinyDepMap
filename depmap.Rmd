@@ -12,7 +12,6 @@ output:
 library(shiny) 
 library(flexdashboard) # devtools::install_github('rstudio/flexdashboard')
 library(ggplot2) # devtools::install_github('hadley/ggplot2')
-library(grid)
 library(RColorBrewer)
 library(shinyWidgets)
 library(plotly)
