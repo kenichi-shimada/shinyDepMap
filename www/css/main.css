@@ -1,0 +1,168 @@
+* {
+  margin: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Lato', sans-serif;
+  background-color: rgba(240,248,255,0.15);
+}
+
+.div_modal .hl {
+  color: #004175;
+}
+.bootstrap-select {
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-color: #ced4de !important;
+ }
+
+.container-fluid {
+  /*height: 100%;*/
+  visibility: visible !important;
+  width: 100% !important;
+}
+
+.tab-content{
+  height: 100%;
+}
+
+
+.card-header {
+  padding: .1rem 1.25rem !important;
+}
+
+/*.col-3 {
+  padding-right: 0.5rem !important;
+  padding-left: 0.5rem !important;
+}
+
+*/
+
+.col-3 {
+  /*overflow-y: hidden;*/
+  padding-right: 8px !important;
+  padding-left: 8px !important;
+
+}
+
+.col-4, .col-5 {
+  min-height: 100%;
+  padding-right: 8px !important;
+  padding-left: 0rem !important;
+}
+
+.function-tab .card {
+  min-height: 100%;
+}
+
+.card-header-tabs{
+  margin-bottom: 0rem 1.25rem !important;
+}
+
+.card-subtitle {
+  padding: .25rem 0rem !important;
+  margin-top: 0rem !important;
+}
+
+.nav-tabs .nav-item {
+  margin-bottom: .5rem !important;
+}
+.nav-tabs .nav-link {
+  padding: 0.25rem .75rem;
+}
+.navbar .nav-link {
+  color: white !important;
+  border-radius: 0 !important;
+}
+
+.navbar .active {
+  background-color: #0f2f58 !important;
+}
+
+.navbar .active i {
+  color: white !important;  
+}
+
+/*table.dataTable tbody th,
+table.dataTable tbody td {
+  white-space: nowrap;
+}
+
+table.dataTable thead th {
+  padding: 8px 10px;
+  padding-right: 18px;
+}
+
+.dataTables_scroll {
+  overflow-x: scroll;
+}
+
+.dataTables_scrollBody  {
+  overflow: unset !important;
+}
+
+.dataTables_scrollHead  {
+  overflow: unset !important;
+  z-index: 10;
+}
+
+table.dataTable tr.selected td.select-checkbox::after {
+  margin-top: -14px !important;
+}
+
+.datatables .selectize-dropdown {
+  width: auto !important;
+}
+
+.datatable--compact th {
+  padding: 10px 5px !important;
+}
+
+.datatable--compact td {
+  padding: 5px 5px !important;
+}
+
+.datatable--compact th:first-child,
+.datatable--compact td:first-child {
+  padding-left: 0px !important;
+}
+
+.datatable--compact th:last-child,
+.datatable--compact td:last-child {
+  padding-right: 0px !important;
+}
+
+.dt-button-collection {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  max-height: 300px;
+  overflow: scroll !important;
+}
+
+.dt-paginate .ellipsis {
+  padding-left: .25rem;
+  padding-right: .25rem;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #404040;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #bfbfbf;
+  cursor: pointer;
+}
+
+a[data-target] {
+  cursor: pointer;
+}*/

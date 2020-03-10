@@ -1,0 +1,18 @@
+## shinyDepMap
+shinyDepMap is a web-tool to explore Cancer Dependency Map (DepMap) project data of the Broad Institute (version 19q3), to help users identify and characterize essential genes among all protein encoding genes. DepMap is a powerful drug discovery tool. Its <a href="https://depmap.org/portal" target="_blank"> portal website</a> provides individual genes’ dependency from both CRISPR and RNAi data. We combined the CRISPR and RNAi dependency data into a unified score, and built this non-programmer biologist-friendly tool, **shinyDepMap**, which allows 1) to compare efficacy and selectivity of a gene loss across 15,847 protein-encoding genes, and 2) genes that work together in pathways or complexes.
+
+### Usage
+This web-tool can be used for the following purposes.
+
++ Predict the efficacy and selectivity of future drugs with a known target gene
++ Identify targets of highly selective drugs
++ Identify maximally sensitive cell lines for testing a drug
++ "Target hop", *i.e.*, navigate from an undruggable protein with the desired selectivity profile to more druggable targets with similar profiles
++ Identify novel pathways needed to cancer cell growth and survival
+
+### Publication
+
+Kenichi Shimada, Jeremy L Muhlich, Timothy J Mitchison. A tool for browsing the Cancer Dependency Map reveals functional connections between genes and helps predict the efficacy and selectivity of candidate cancer drugs. *bioRxiv*. <a href = "https://doi.org/10.1101/2019.12.13.874776", target="_blank"> doi.org/10.1101/2019.12.13.874776 </a>
+
+### Inquiries
+Please contact [Kenichi Shimada](mailto:kenichi_shimada[at]hms.harvard.edu) for inquiries.
