@@ -1,9 +1,9 @@
-function(req) {
+  function(req) {
   list(
     htmltools::htmlDependency(
       "font-awesome", 
       "5.3.1", "www/shared/fontawesome", package = "shiny", 
-      stylesheet = c("css/all.min.css", "css/v4-shims.min.css")
+      stylesheet = c("www/css/main.css")
     ),
     # DT:::DTDependency("default"),
     # DT:::extDependency("Buttons", "default", list()),
@@ -11,8 +11,28 @@ function(req) {
       tags$link(href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap", rel="stylesheet"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/slider.css"),
       tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
+      tags$style(type = "text/css", ".irs-grid-pol.small {height: 0px;}"),
       tags$script(src = "js/main.js"),
     ),
+    tags$head( tags$style( type = "text/css", '
+          #cluster-prob2 .irs-line-mid{
+            background: #428bca ;
+            border: 1px solid #428bca ;
+          }
+          #cluster-prob2 .irs-line-right{
+            background: #428bca ;
+          }
+          #cluster-prob2 .irs-bar {
+            background: linear-gradient(to bottom, #DDD -50%, #FFF 150%);
+            border-top: 1px solid #CCC ;
+            border-bottom: 1px solid #CCC ;
+          }
+          #cluster-prob2 .irs-bar-edge {
+            background: inherit ;
+            border: inherit ;
+          }
+
+        ')),    
     webpage(
       nav = navbar(
         tags$a(
@@ -75,7 +95,7 @@ function(req) {
                 d4("shinyDepMap") %>% 
                   font(align = "center") %>%
                   yonder::margin (top = 1),
-                h4("A web-tool to explore the Cancer Dependency Map (DepMap) project.") %>%
+                h4("A web-tool to explore the Cancer Dependency Map (DepMap) project") %>%
                   font(align = "center") %>%
                   yonder::margin(b = 4),
                 columns( # ├ applications ----
@@ -97,11 +117,11 @@ function(req) {
                         # icon("circle", class = "fa-6x selectivity--pink"),
                         h2("Gene essentiality") %>% 
                           yonder::margin(top = 2),
-                        h5("(15,847 protein-encoding genes)")
+                        h5("(All protein-encoding genes)")
                       ) 
                     ) %>% 
                       font(color = "black"),
-                    p("Gene essentiality varies across different genes and cells to test.",br(),
+                    p("Gene essentiality varies across different genes and tested cell lines.",br(),
                       "Explore which gene is essential in hundreds of cell lines."),
                     p(
                       div(
@@ -132,7 +152,7 @@ function(req) {
                         # icon("circle", class = "fa-6x similarity--green"),
                         h2("Gene cluster") %>% 
                           yonder::margin(top = 2),
-                        h5("(2,492 essential genes)")
+                        h5("(Essential genes)")
                       ) 
                     ) %>% 
                       font(color = "black"),
@@ -156,7 +176,19 @@ function(req) {
                     display("flex") %>% 
                     flex(direction = "column") %>% 
                     font(align = "center") %>%
-                    shadow("small")
+                    shadow("small"),
+                  column(
+                    width = 12,
+                    h5(
+                      tags$a(
+                        href="https://labsyspharm.shinyapps.io/depmap_v1",
+                        target="_blank",
+                        "Older version (ver.1)")
+                    )
+                  ) %>%
+                      yonder::margin(bottom = 3) %>% 
+                      font(align = "center")
+                    
                 )
               ) 
             )

@@ -35,15 +35,20 @@ function(input, output, session) {
   observeEvent(c(input$link_cluster), {
     navToPage("cluster")
   })
-  
+
+  essential.def <- callModule(scoreDefinitionServer, "essentiality")
+  cluster.def <- callModule(scoreDefinitionServer, "cluster")
+   
   callModule(
     module = essentialityServer,
-    id = "essentiality"
+    id = "essentiality",
+    defs = cluster.def
   )
 
   callModule(
     module = clusterServer,
-    id = "cluster"
+    id = "cluster",
+    defs = essential.def
   )
-  
+
 }
