@@ -5,7 +5,6 @@ library(plotly)
 library(DT)
 library(igraph)
 library(visNetwork)
-library(aws.s3) # this should be removed
 library(tibble)
 library(shinyjs)
 library(dplyr)
