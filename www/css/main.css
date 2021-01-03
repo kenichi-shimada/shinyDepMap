@@ -27,14 +27,10 @@ body, html {
   height: 100%;
 }
 
-.card-body {
-  padding: .5rem .5rem !important;
-}
 
 .card-header {
   padding: .1rem 1.25rem !important;
 }
-
 
 /*.col-3 {
   padding-right: 0.5rem !important;
@@ -68,8 +64,6 @@ body, html {
   padding: .25rem 0rem !important;
   margin-top: 0rem !important;
 }
-
-
 
 .nav-tabs .nav-item {
   margin-bottom: .5rem !important;

@@ -7,7 +7,7 @@ essentialityModal <- function() {
       class = "div_modal",
       p("shinyDepMap first asks whether a gene of interest is essential or not in any cells.",
         "If essential, it also asks whether the gene is essential in all the cell lines or only in a subset.",
-        "Selectively essential genes are the genes required by only a subset of cells, which can be a good candidate gene for the targeted therapy. The",
+        "Selectively essential genes are the genes required by only a subset of cells, which may be a good candidate gene for the targeted therapy. The",
         tags$b("Gene essentiality app"), "summarizes the gene essentiality using two parameters:"),
       tags$ul(
         tags$li(tags$b("Efficacy"),": how essential the gene is in the sensitive cell lines ",
@@ -19,7 +19,7 @@ essentialityModal <- function() {
       p("Using arbitrary thresholds (efficacy = -0.56, selectivity = 1), ",
         "shown in grey lines in the ",tags$b('Efficacy/selectivity plot',class="hl"),
         "we defined 2,492 genes are esential, 733 of which are selectively essential ",
-        "(See ", tags$a(href="https://doi.org/10.1101/2019.12.13.874776","our paper",target="_blank")," for details)."),
+        "(See ", tags$a(href="https://doi.org/10.1101/2019.12.13.874776","our paper")," for details)."),
       p("Here are two use cases that the ",tags$b("Gene essentiality app")," may be helpful.") %>% 
         yonder::margin(l = "auto", r = "auto", b = 2),
  
@@ -80,7 +80,7 @@ clusterModal <- function() {
         "across 423 cell lines—the resulting clusters group essential genes that likely work together.", 
         "Here, we used acustomized cluster algorithm, which controls the size and tightness",
         "(i.e., strength of the connection) of the clusters",
-        "(See ", tags$a(href="https://doi.org/10.1101/2019.12.13.874776","our paper",target="_blank")," for details).",
+        "(See ", tags$a(href="https://doi.org/10.1101/2019.12.13.874776","our paper")," for details).",
         " The ",tags$b("Gene cluster app")," allows users to take a look at these clusters."),
       p("Here are two use cases of the ",tags$b("Gene cluster app.")),
 
