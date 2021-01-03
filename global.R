@@ -17,7 +17,7 @@ source("modules/modals.R",local=TRUE)
 source("modules/essentiality.R",local=TRUE)
 source("modules/cluster.R",local=TRUE)
 
-x <- load("data/depmap_initial_19q3_v3_local_run.rda")
+x <- load(url("https://ndownloader.figshare.com/files/25893237"))
 
 mix.ratios <- c("shRNA","80:20","60:40","40:60 (default)","20:80","CRISPR")
 names(eids.ess) <- names(thres.eff) <- mix.ratios
