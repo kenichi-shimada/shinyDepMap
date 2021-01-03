@@ -44,7 +44,7 @@ essentialityUI <- function(id) {
             tags$hr(),
             materialSwitch(
               inputId = ns("definition"),
-              label = "Tuning dependency score:",
+              label = "Tuning dependency score (for power users):",
               value=FALSE
             ),
 
@@ -101,17 +101,16 @@ essentialityUI <- function(id) {
                   " and you will jump to the gene's description in the Gene Cards website."),
               tags$li(tags$b('Select a matched gene'),"from a dropdown menu in the lower-left",
                       "and you will find the gene's dependency scores across hundreds of cell lines in the ",tags$b('Dependency scores')," tab"),
-              tags$li("[Optional] Two parameters, ", tags$b("Mix Ratio"), "and ", tags$b("Efficacy threshold"),
-                  ", affect the definition of the Dependency scores, which influences the gene essentiality. ",
-                  " Note: please change these parameters at your own risk; ",
-                  "the Dep score to which shRNA contributes more than CRISPR seems less accurate and we don't recommend its use."),
+              tags$li("[Optional] Users can tune parameters that determines the Dependency scores, efficacy, and selectivity.",
+                  "Please note that changing these parameters can significantly harm the consequence. ",
+                  "e.g., the Dep score to which shRNA contributes more than CRISPR seems less accurate and we don't recommend its use for analyses.",
+                  "Refer to the original paper for more information."),
               tags$ul(
-                tags$li("Toggle the Dependency parameters on"),
-                tags$li("Choose a ",tags$b("Mix Ratio (shRNA/CRISPR)")),
-                tags$li("Choose a ",tags$b("Efficacy threshold (percentile)")),
-                tags$li("Click ",tags$b("Recompute dependency score"),"button"),
-                tags$li("Change in the ",tags$b("Efficacy threshold"), "affect the clusters"),
-              )              
+                tags$li(tags$b("Mix Ratio"),"is the mixing ratio between shRNA and CRISPR, at which the unified Dependency score is computed via linear combination"),
+                tags$li(tags$b("Efficacy threshold"), "determines efficacy and selectivity.",
+                  "When this threshold is X (e.g., X = 1),",tags$b("efficacy")," is defined as the bottom X-th percentile, and",
+                  tags$b("selectivity"),"as the difference between X-th and 100-Xth percentiles, of each gene's Dependency scores across all the cell lines"),
+              )
             )
           )
         )

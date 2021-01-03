@@ -11,7 +11,7 @@ clusterUI <- function(id) {
           values = c("filters", "instructions"),
           selected = "filters"
         ),
-        useShinyjs(),  
+        useShinyjs(),
         navContent(
           navPane(
             id = ns("pane_filters"),
@@ -23,7 +23,8 @@ clusterUI <- function(id) {
               options = list(`live-search` = TRUE)
             ),
             setSliderColor(c("","","","Teal","Teal","Teal"),c(4,5)),
-            tags$hr(),#tags$h5("Tuning clusters:"),
+            tags$hr(),
+            tags$h6("Tuning clusters (see Help for details):"),
             sliderTextInput(
                 inputId = ns("cs2"),
                 label = tags$h6("Cluster size"),
@@ -34,7 +35,7 @@ clusterUI <- function(id) {
             ),
              sliderInput(
               inputId = ns("prob2"),
-              label = tags$h6("Prob. threshold (Cluster assignment)"),
+              label = tags$h6("Probability threshold"),
               min = 0,
               max = 1,
               step = 0.1,
@@ -48,7 +49,7 @@ clusterUI <- function(id) {
             tags$hr(),
             materialSwitch(
               inputId = ns("more_params"),
-              label = "Tuning dependency score:",
+              label = "Tuning dependency score (for power users):",
               value=FALSE
             ),
             conditionalPanel(
@@ -93,26 +94,28 @@ clusterUI <- function(id) {
               tags$li(tags$b('Connectivity')," shows the intra-cluster connectivity, ",
                       "where strongly correlated genes (Spearman > 0.1) are connected by edges."),
               tags$li(tags$b('Correlation')," shows the Spearman cor. coef. between the query gene and the other essential genes, ",
-                      "stratified by clusters."),
+                      "grouped by clusters."),
               tags$li("Recompute clusters by changing ",tags$b("Cluster size"),
                       " and ",tags$b("Probability threshold"), "and clicking ",
                       tags$b("Recompute clusters"), "button (see the paper for details)"),
               tags$ul(
-                tags$li(tags$b("Cluster size"), "describes the size and tightness of the clusters. ",
+                tags$li(tags$b("Cluster size"), "controls the size and tightness of the clusters. ",
                   "'Large' clusters contain more genes per cluster while 'Small' cluster contains more strongly correlated genes"),
-                tags$li(tags$b("Probability threshold"),"describes the probability that each gene belongs to the assigned cluster"),
-              ),              tags$li("[Optional] Two parameters, ", tags$b("Mix Ratio"), "and ", tags$b("Efficacy threshold"),
-                  ", affect the definition of the Dependency scores, which influences the gene essentiality ",
-                  " Note: please change these parameters at your own risk; ",
-                  "e.g., the Dep score to which shRNA contributes more than CRISPR seems less accurate and we don't recommend its use."),
+                tags$li(tags$b("Probability threshold"),
+                  "filters genes based on the probability at which each gene belongs to the assigned cluster, computed by ECHODOTS algorithm.",
+                  "A probability close to 1 indicates that the gene belongs to the assigned cluster with high confidence.",
+                  "When the threshold of X (e.g., X = 0.5) is selected, genes whose probability is within [X,1] will be shown")
+              ),
+              tags$li("[Optional] Users can tune parameters that determines the Dependency scores, efficacy, and selectivity.",
+                  "Please note that changing these parameters can significantly harm the consequence. ",
+                  "e.g., the Dep score to which shRNA contributes more than CRISPR seems less accurate and we don't recommend its use for analyses.",
+                  "Refer to the original paper for more information."),
               tags$ul(
-                tags$li("Toggle the Dependency parameters on"),
-                tags$li("Choose a ",tags$b("Mix Ratio (shRNA/CRISPR)")),
-                tags$li("Choose a ",tags$b("Efficacy threshold (percentile)")),
-                tags$li("Click ",tags$b("Recompute dependency score"),"button"),
-                tags$li("Change in the ",tags$b("Efficacy threshold"), "affect the clusters"),
+                tags$li(tags$b("Mix Ratio"),"is the mixing ratio between shRNA and CRISPR, at which the unified Dependency score is computed via linear combination"),
+                tags$li(tags$b("Efficacy threshold"), "determines efficacy and selectivity.",
+                  "When this threshold is X (e.g., X = 1),",tags$b("efficacy")," is defined as the bottom X-th percentile, and",
+                  tags$b("selectivity"),"as the difference between X-th and 100-Xth percentiles, of each gene's Dependency scores across all the cell lines"),
               )
-
             )
           )
         )
