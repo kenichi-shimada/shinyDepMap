@@ -1,4 +1,4 @@
-library(ggplot2) 
+library(ggplot2)
 library(RColorBrewer)
 library(shinyWidgets)
 library(plotly)
@@ -27,7 +27,7 @@ mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {
   .data
 }
 
-# df <- df %>% mutate(pri=uniq.cols[round(rank(df$selectivity)/nrow(df)*n)+1]) 
+# df <- df %>% mutate(pri=uniq.cols[round(rank(df$selectivity)/nrow(df)*n)+1])
 # hover: add probability
 
 scoreDefinitionServer <- function(input, output, session) {
