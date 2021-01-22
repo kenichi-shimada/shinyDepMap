@@ -16,7 +16,7 @@ the required R pacakges as follows:
 install.packages("devtools")
 install.packages("BiocManager")
 
-BiocManager::install(c("ggplot2","shiny","markdown","RColorBrewer","shinyWidgets","plotly","DT","igraph","visNetwork","tibble","dplyr","tidyr","yonder"))
+BiocManager::install(c("ggplot2","shiny","markdown","RColorBrewer","shinyWidgets","plotly","DT","igraph","visNetwork","tibble","shinyjs","dplyr","tidyr","yonder"))
 ```
 
 ### Launch the app

@@ -5,7 +5,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN Rscript \
-  -e "BiocManager::install(c('shiny','markdown','RColorBrewer','shinyWidgets','plotly','DT','igraph','visNetwork','tibble','dplyr','tidyr','yonder'))"
+  -e "BiocManager::install(c('shiny','markdown','RColorBrewer','shinyWidgets','plotly','DT','igraph','visNetwork','tibble','shinyjs','dplyr','tidyr','yonder'))"
 
 COPY / /app/shinyDepMap
 
