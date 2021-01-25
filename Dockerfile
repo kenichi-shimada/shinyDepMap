@@ -9,6 +9,15 @@ RUN Rscript \
 
 COPY / /app/shinyDepMap
 
+# Pre-download data file so it's included in the image and users don't need
+# to wait for it to download on every run. Validate total size is correct
+# as an extra sanity check against interrupted / timed-out downloads.
+RUN wget \
+  -O /app/shinyDepMap/depmap_initial_19q3_v3_local_run.rda \
+  --progress=dot:giga \
+  https://ndownloader.figshare.com/files/25893237 \
+  && [ "$(stat -c %s /app/shinyDepMap/depmap_initial_19q3_v3_local_run.rda)x" = 415441828x ]
+
 WORKDIR /app
 EXPOSE 8888
 CMD [ \
