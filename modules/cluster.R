@@ -911,7 +911,10 @@ clusterServer <- function(input, output, session, defs) {
       filter(efficacy < thres.eff[[isolate(im())]]) %>%
       filter(!!as.symbol(cs.idx2) %in% this.cl))$eid
 
-    s3load(paste0("graph_19q3_v3/",isolate(im()),"/",this.cl,".rda"),bucket="depmap") # nodes,edges
+    g <- graphs[[im()]][[cs.idx2]][[this.cl]]
+    # s3load(paste0("graph_19q3_v3/",isolate(im()),"/",this.cl,".rda"),bucket="depmap") # nodes,edges
+    nodes <- g$nodes
+    edges <- g$edges
 
     nodes <- nodes %>% filter(id %in% eids)    
     edges <- edges %>% filter(from %in% eids & to %in% eids)
