@@ -1,4 +1,5 @@
 .Renviron
+.Rhistory
 .DS_Store
 *.rda
 archive
