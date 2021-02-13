@@ -12,7 +12,7 @@ This web-tool can be used for the following purposes.
 
 ### Publication
 
-Kenichi Shimada, Jeremy L Muhlich, Timothy J Mitchison. A tool for browsing the Cancer Dependency Map reveals functional connections between genes and helps predict the efficacy and selectivity of candidate cancer drugs. *bioRxiv*. <a href = "https://doi.org/10.1101/2019.12.13.874776", target="_blank"> doi.org/10.1101/2019.12.13.874776 </a>
+Kenichi Shimada, John A Bachman, Jeremy L Muhlich, Timothy J Mitchison. shinyDepMap, a tool to identify targetable cancer genes and their functional connections from Cancer Dependency Map data. *eLife*, 2021, <a href = "https://doi.org/10.7554/eLife.57116", target="_blank"> DOI: 10.7554/eLife.57116 </a>
 
 ### Inquiries
 Please contact [Kenichi Shimada](mailto:kenichi_shimada[at]hms.harvard.edu) for inquiries.
